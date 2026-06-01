@@ -9,6 +9,7 @@
 #include "EnhancedInputComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Components/StaticMeshComponent.h"
 
 // Sets default values
 AInGamePlayer::AInGamePlayer()
@@ -21,6 +22,9 @@ AInGamePlayer::AInGamePlayer()
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
+
+	Katana = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Katana"));
+	Katana->SetupAttachment(GetMesh(), TEXT("Katana_Socket"));
 
 	GetMesh()->SetRelativeLocationAndRotation(
 		FVector(0, 0, -GetCapsuleComponent()->GetScaledCapsuleHalfHeight()),

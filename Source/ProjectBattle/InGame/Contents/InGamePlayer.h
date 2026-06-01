@@ -11,6 +11,7 @@
 class USpringArmComponent;
 class UCameraComponent;
 class UInputAction;
+class UStaticMeshComponent;
 
 UCLASS()
 class PROJECTBATTLE_API AInGamePlayer : public ACharacter
@@ -37,6 +38,11 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UCameraComponent> Camera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UStaticMeshComponent> Katana;
+
+
 
 
 	//Input ¼³Á¤
