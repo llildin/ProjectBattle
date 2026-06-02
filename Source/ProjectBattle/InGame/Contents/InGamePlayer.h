@@ -13,6 +13,14 @@ class UCameraComponent;
 class UInputAction;
 class UStaticMeshComponent;
 
+UENUM(BlueprintType)
+enum class EMoveState : uint8
+{
+	Idle = 0 UMETA(DisplayName = "Idle"),
+	Walk = 10 UMETA(DisplayName = "Walk"),
+	Run = 20 UMETA(DisplayName = "Run")
+};
+
 UCLASS()
 class PROJECTBATTLE_API AInGamePlayer : public ACharacter
 {
