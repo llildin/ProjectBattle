@@ -19,6 +19,7 @@ AInGamePlayer::AInGamePlayer()
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->SetupAttachment(RootComponent);
+	SpringArm->TargetArmLength = 500.0f;
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
@@ -70,19 +71,22 @@ void AInGamePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 void AInGamePlayer::Move(const FInputActionValue& Value)
 {
-	FVector2D Direction = Value.Get<FVector2D>();
+	if (CurrentState != ECurrentState::Attack && CurrentState != ECurrentState::On_Damaged && CurrentState != ECurrentState::Rolling)
+	{
+		FVector2D Direction = Value.Get<FVector2D>();
 
-	FRotator CameraRotation = GetControlRotation();
+		FRotator CameraRotation = GetControlRotation();
 
-	FRotator CameraRotaitionInFloor = FRotator(0, CameraRotation.Yaw, 0);
+		FRotator CameraRotaitionInFloor = FRotator(0, CameraRotation.Yaw, 0);
 
-	FVector CameraForwardInFloor = UKismetMathLibrary::GetForwardVector(CameraRotaitionInFloor);
+		FVector CameraForwardInFloor = UKismetMathLibrary::GetForwardVector(CameraRotaitionInFloor);
 
-	FVector CameraRightInFloor = UKismetMathLibrary::GetRightVector(CameraRotaitionInFloor);
+		FVector CameraRightInFloor = UKismetMathLibrary::GetRightVector(CameraRotaitionInFloor);
 
-	AddMovementInput(CameraForwardInFloor * Direction.X);
+		AddMovementInput(CameraForwardInFloor * Direction.X);
 
-	AddMovementInput(CameraRightInFloor * Direction.Y);
+		AddMovementInput(CameraRightInFloor * Direction.Y);
+	}
 }
 
 void AInGamePlayer::Look(const FInputActionValue& Value)
@@ -98,6 +102,7 @@ void AInGamePlayer::No_Battle(const FInputActionValue& Value)
 	if (CurrentState == ECurrentState::Battle)
 	{
 		SetCurrentState(ECurrentState::No_Battle);
+		GetCharacterMovement()->bOrientRotationToMovement = true;
 	}
 }
 
@@ -129,6 +134,14 @@ void AInGamePlayer::BasicComboAttack()
 			bIsBasicAttacking = true;
 
 			SetCurrentState(ECurrentState::Attack);
+
+			GetCharacterMovement()->bOrientRotationToMovement = false;
+
+			FRotator StartRotator = GetControlRotation();
+			FRotator EndRotator = GetActorRotation();
+			EndRotator.Pitch = -40.0f;
+			EndRotator.Roll = 0.0f;
+			BattleCameraSetting(StartRotator, EndRotator);
 
 			PlayingBasicComboAttackIndex = BasicComboAttackCount;
 		}

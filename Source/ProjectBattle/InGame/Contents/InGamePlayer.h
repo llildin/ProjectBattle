@@ -98,6 +98,9 @@ public:
 
 	void SetCurrentState(ECurrentState NewState);
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void BattleCameraSetting(FRotator StartRotator, FRotator EndRotator);
+
 
 	//BasicCombo
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
