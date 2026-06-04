@@ -34,7 +34,4 @@ public:
 	EMoveState MoveState = EMoveState::Idle;
 	
 	AInGamePlayer* Player;
-
-	UFUNCTION()
-	void AnimNotify_CheckCombo_SK_CPP();
 };
