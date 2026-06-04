@@ -21,11 +21,16 @@ enum class EMoveState : uint8
 	Run = 20 UMETA(DisplayName = "Run")
 };
 
-//UENUM(BlueprintType)
-//enum class EBattleState : uint8
-//{
-//
-//};
+UENUM(BlueprintType)
+enum class ECurrentState : uint8
+{
+	No_Battle = 0 UMETA(DisplayName = "No_Battle"),
+	Battle = 10 UMETA(DisplayName = "Battle"),
+	Guard = 20 UMETA(DisplayName = "Guard"),
+	Attack = 30 UMETA(DisplayName = "Attack"),
+	On_Damaged = 40 UMETA(DisplayName = "On_Damaged"),
+	Rolling = 50 UMETA(DisplayName = "Rolling")
+};
 
 UCLASS()
 class PROJECTBATTLE_API AInGamePlayer : public ACharacter
@@ -72,12 +77,29 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputAction> IA_BasicAttack;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	TObjectPtr<UInputAction> IA_No_Battle;
+
 
 	//Input 호출 함수
 	void Move(const FInputActionValue& Value);
 
 	void Look(const FInputActionValue& Value);
 
+	void No_Battle(const FInputActionValue& Value);
+
+
+	//Player 상태
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	ECurrentState CurrentState = ECurrentState::No_Battle;
+
+	DECLARE_DELEGATE_OneParam(FOnStateChanged, ECurrentState)
+	FOnStateChanged OnStateChanged;
+
+	void SetCurrentState(ECurrentState NewState);
+
+
+	//BasicCombo
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
 	uint8 BasicComboAttackCount = 0;
 

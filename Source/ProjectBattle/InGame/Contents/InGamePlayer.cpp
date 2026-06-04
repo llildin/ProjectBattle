@@ -64,6 +64,7 @@ void AInGamePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		UIC->BindAction(IA_Jump, ETriggerEvent::Canceled, this, &AInGamePlayer::StopJumping);
 
 		UIC->BindAction(IA_BasicAttack, ETriggerEvent::Started, this, &AInGamePlayer::BasicComboAttack);
+		UIC->BindAction(IA_No_Battle, ETriggerEvent::Started, this, &AInGamePlayer::No_Battle);
 	}
 }
 
@@ -92,6 +93,20 @@ void AInGamePlayer::Look(const FInputActionValue& Value)
 	AddControllerYawInput(RotationDirection.X);
 }
 
+void AInGamePlayer::No_Battle(const FInputActionValue& Value)
+{
+	if (CurrentState == ECurrentState::Battle)
+	{
+		SetCurrentState(ECurrentState::No_Battle);
+	}
+}
+
+void AInGamePlayer::SetCurrentState(ECurrentState NewState)
+{
+	CurrentState = NewState;
+	OnStateChanged.ExecuteIfBound(NewState);
+}
+
 void AInGamePlayer::BasicCheckComboAttack()
 {
 	if (PlayingBasicComboAttackIndex != BasicComboAttackCount)
@@ -103,19 +118,24 @@ void AInGamePlayer::BasicCheckComboAttack()
 
 void AInGamePlayer::BasicComboAttack()
 {
-	if (!bIsBasicAttacking)
+	if (CurrentState == ECurrentState::No_Battle || CurrentState == ECurrentState::Battle || CurrentState == ECurrentState::Attack)
 	{
-		BasicComboAttackCount++;
+		if (!bIsBasicAttacking)
+		{
+			BasicComboAttackCount++;
 
-		PlayBasicComboAttackMontage();
+			PlayBasicComboAttackMontage();
 
-		bIsBasicAttacking = true;
+			bIsBasicAttacking = true;
 
-		PlayingBasicComboAttackIndex = BasicComboAttackCount;
-	}
-	else if (bIsBasicAttacking && PlayingBasicComboAttackIndex == BasicComboAttackCount)
-	{
-		BasicComboAttackCount++;
+			SetCurrentState(ECurrentState::Attack);
+
+			PlayingBasicComboAttackIndex = BasicComboAttackCount;
+		}
+		else if (bIsBasicAttacking && PlayingBasicComboAttackIndex == BasicComboAttackCount)
+		{
+			BasicComboAttackCount++;
+		}
 	}
 }
 
@@ -137,6 +157,7 @@ void AInGamePlayer::PlayBasicComboAttackMontage()
 					BasicComboAttackCount = 0;
 					PlayingBasicComboAttackIndex = 0;
 					bIsBasicAttacking = false;
+					SetCurrentState(ECurrentState::Battle);
 				}
 				});
 			AnimInstance->Montage_SetEndDelegate(EndDelegate);

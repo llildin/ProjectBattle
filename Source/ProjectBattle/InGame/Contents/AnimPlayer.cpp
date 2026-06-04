@@ -12,6 +12,11 @@ void UAnimPlayer::NativeInitializeAnimation()
 	Super::NativeInitializeAnimation();
 
 	Player = Cast<AInGamePlayer>(TryGetPawnOwner());
+
+	if (Player)
+	{
+		Player->OnStateChanged.BindUObject(this, &UAnimPlayer::OnCurrentStateChanged);
+	}
 }
 
 void UAnimPlayer::NativeUpdateAnimation(float DeltaSeconds)
@@ -22,7 +27,6 @@ void UAnimPlayer::NativeUpdateAnimation(float DeltaSeconds)
 	{
 		Speed = Player->GetCharacterMovement()->Velocity.Size2D();
 		Direction = UKismetAnimationLibrary::CalculateDirection(Player->GetCharacterMovement()->Velocity, Player->GetActorRotation());
-
 	}
 }
 
@@ -39,4 +43,9 @@ void UAnimPlayer::NativeThreadSafeUpdateAnimation(float DeltaSeconds)
 	{
 		MoveState = EMoveState::Walk;
 	}
+}
+
+void UAnimPlayer::OnCurrentStateChanged(ECurrentState NewState)
+{
+	CurrentState = NewState;
 }

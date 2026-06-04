@@ -32,6 +32,11 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
 	EMoveState MoveState = EMoveState::Idle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	ECurrentState CurrentState = ECurrentState::No_Battle;
+
+	void OnCurrentStateChanged(ECurrentState NewState);
 	
 	AInGamePlayer* Player;
 };
