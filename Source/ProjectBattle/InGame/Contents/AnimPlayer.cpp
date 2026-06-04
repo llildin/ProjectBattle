@@ -40,3 +40,9 @@ void UAnimPlayer::NativeThreadSafeUpdateAnimation(float DeltaSeconds)
 		MoveState = EMoveState::Walk;
 	}
 }
+
+void UAnimPlayer::AnimNotify_CheckCombo_SK_CPP()
+{
+	UE_LOG(LogTemp, Warning, TEXT("AnimNotify_CheckCombo_SK_CPP"));
+
+}

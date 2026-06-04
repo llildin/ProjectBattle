@@ -62,6 +62,8 @@ void AInGamePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		UIC->BindAction(IA_Jump, ETriggerEvent::Triggered, this, &AInGamePlayer::Jump);
 		UIC->BindAction(IA_Jump, ETriggerEvent::Completed, this, &AInGamePlayer::StopJumping);
 		UIC->BindAction(IA_Jump, ETriggerEvent::Canceled, this, &AInGamePlayer::StopJumping);
+
+		UIC->BindAction(IA_BasicAttack, ETriggerEvent::Started, this, &AInGamePlayer::BasicComboAttack);
 	}
 }
 
@@ -88,5 +90,57 @@ void AInGamePlayer::Look(const FInputActionValue& Value)
 
 	AddControllerPitchInput(RotationDirection.Y);
 	AddControllerYawInput(RotationDirection.X);
+}
+
+void AInGamePlayer::BasicCheckComboAttack()
+{
+	if (PlayingBasicComboAttackIndex != BasicComboAttackCount)
+	{
+		PlayBasicComboAttackMontage();
+		PlayingBasicComboAttackIndex = BasicComboAttackCount;
+	}
+}
+
+void AInGamePlayer::BasicComboAttack()
+{
+	if (!bIsBasicAttacking)
+	{
+		BasicComboAttackCount++;
+
+		PlayBasicComboAttackMontage();
+
+		bIsBasicAttacking = true;
+
+		PlayingBasicComboAttackIndex = BasicComboAttackCount;
+	}
+	else if (bIsBasicAttacking && PlayingBasicComboAttackIndex == BasicComboAttackCount)
+	{
+		BasicComboAttackCount++;
+	}
+}
+
+void AInGamePlayer::PlayBasicComboAttackMontage()
+{
+	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+	{
+		FString SectionName = FString::Printf(TEXT("BasicAttack0%d"), BasicComboAttackCount);
+
+		float MontageLength = PlayAnimMontage(BasicComboAttackMontage, 1.0f, FName(SectionName));
+
+		if (MontageLength > 0)
+		{
+			FOnMontageEnded EndDelegate;
+
+			EndDelegate.BindLambda([this](UAnimMontage* Montage, bool bInterrupted) {
+				if (!bInterrupted)
+				{
+					BasicComboAttackCount = 0;
+					PlayingBasicComboAttackIndex = 0;
+					bIsBasicAttacking = false;
+				}
+				});
+			AnimInstance->Montage_SetEndDelegate(EndDelegate);
+		}
+	}
 }
 

@@ -69,13 +69,34 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputAction> IA_Jump;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	TObjectPtr<UInputAction> IA_BasicAttack;
+
 
 	//Input 호출 함수
 	void Move(const FInputActionValue& Value);
 
 	void Look(const FInputActionValue& Value);
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
+	uint8 BasicComboAttackCount = 0;
 
+	UFUNCTION(BlueprintCallable)
+	void BasicCheckComboAttack();
+
+	UFUNCTION(BlueprintCallable)
+	void BasicComboAttack();
+
+	void PlayBasicComboAttackMontage();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
+	TObjectPtr<UAnimMontage> BasicComboAttackMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
+	uint8 bIsBasicAttacking : 1 = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
+	uint8 PlayingBasicComboAttackIndex = 0;
 
 
 };
