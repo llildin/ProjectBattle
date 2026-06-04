@@ -80,6 +80,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputAction> IA_No_Battle;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	TObjectPtr<UInputAction> IA_Guard;
+
 
 	//Input 호출 함수
 	void Move(const FInputActionValue& Value);
@@ -87,6 +90,10 @@ public:
 	void Look(const FInputActionValue& Value);
 
 	void No_Battle(const FInputActionValue& Value);
+
+	void GuardStart(const FInputActionValue& Value);
+
+	void GuardEnd(const FInputActionValue& Value);
 
 
 	//Player 상태

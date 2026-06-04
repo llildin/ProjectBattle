@@ -66,6 +66,9 @@ void AInGamePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 		UIC->BindAction(IA_BasicAttack, ETriggerEvent::Started, this, &AInGamePlayer::BasicComboAttack);
 		UIC->BindAction(IA_No_Battle, ETriggerEvent::Started, this, &AInGamePlayer::No_Battle);
+
+		UIC->BindAction(IA_Guard, ETriggerEvent::Started, this, &AInGamePlayer::GuardStart);
+		UIC->BindAction(IA_Guard, ETriggerEvent::Completed, this, &AInGamePlayer::GuardEnd);
 	}
 }
 
@@ -99,10 +102,26 @@ void AInGamePlayer::Look(const FInputActionValue& Value)
 
 void AInGamePlayer::No_Battle(const FInputActionValue& Value)
 {
-	if (CurrentState == ECurrentState::Battle)
+	if (CurrentState == ECurrentState::Battle || CurrentState == ECurrentState::Guard)
 	{
 		SetCurrentState(ECurrentState::No_Battle);
 		GetCharacterMovement()->bOrientRotationToMovement = true;
+	}
+}
+
+void AInGamePlayer::GuardStart(const FInputActionValue& Value)
+{
+	if (CurrentState == ECurrentState::Battle)
+	{
+		SetCurrentState(ECurrentState::Guard);
+	}
+}
+
+void AInGamePlayer::GuardEnd(const FInputActionValue& Value)
+{
+	if (CurrentState == ECurrentState::Guard)
+	{
+		SetCurrentState(ECurrentState::Battle);
 	}
 }
 
@@ -123,7 +142,8 @@ void AInGamePlayer::BasicCheckComboAttack()
 
 void AInGamePlayer::BasicComboAttack()
 {
-	if (CurrentState == ECurrentState::No_Battle || CurrentState == ECurrentState::Battle || CurrentState == ECurrentState::Attack)
+	if (CurrentState == ECurrentState::No_Battle || CurrentState == ECurrentState::Battle 
+		|| CurrentState == ECurrentState::Attack || CurrentState == ECurrentState::Guard)
 	{
 		if (!bIsBasicAttacking)
 		{
@@ -133,15 +153,18 @@ void AInGamePlayer::BasicComboAttack()
 
 			bIsBasicAttacking = true;
 
+			if (CurrentState == ECurrentState::No_Battle)
+			{
+				GetCharacterMovement()->bOrientRotationToMovement = false;
+
+				FRotator StartRotator = GetControlRotation();
+				FRotator EndRotator = GetActorRotation();
+				EndRotator.Pitch = -40.0f;
+				EndRotator.Roll = 0.0f;
+				BattleCameraSetting(StartRotator, EndRotator);
+			}
+
 			SetCurrentState(ECurrentState::Attack);
-
-			GetCharacterMovement()->bOrientRotationToMovement = false;
-
-			FRotator StartRotator = GetControlRotation();
-			FRotator EndRotator = GetActorRotation();
-			EndRotator.Pitch = -40.0f;
-			EndRotator.Roll = 0.0f;
-			BattleCameraSetting(StartRotator, EndRotator);
 
 			PlayingBasicComboAttackIndex = BasicComboAttackCount;
 		}
