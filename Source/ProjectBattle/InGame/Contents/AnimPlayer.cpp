@@ -39,9 +39,13 @@ void UAnimPlayer::NativeThreadSafeUpdateAnimation(float DeltaSeconds)
 	{
 		MoveState = EMoveState::Idle;
 	}
-	else if (Speed < 4000)
+	else if (Speed <= 300)
 	{
 		MoveState = EMoveState::Walk;
+	}
+	else if (Speed >= 590)
+	{
+		MoveState = EMoveState::Run;
 	}
 }
 

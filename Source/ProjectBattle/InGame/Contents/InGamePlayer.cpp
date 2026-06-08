@@ -69,6 +69,10 @@ void AInGamePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 		UIC->BindAction(IA_Guard, ETriggerEvent::Started, this, &AInGamePlayer::GuardStart);
 		UIC->BindAction(IA_Guard, ETriggerEvent::Completed, this, &AInGamePlayer::GuardEnd);
+
+		UIC->BindAction(IA_Roll, ETriggerEvent::Started, this, &AInGamePlayer::Roll);
+		UIC->BindAction(IA_Run, ETriggerEvent::Started, this, &AInGamePlayer::RunStart);
+		UIC->BindAction(IA_Run, ETriggerEvent::Completed, this, &AInGamePlayer::RunEnd);
 	}
 }
 
@@ -105,6 +109,7 @@ void AInGamePlayer::No_Battle(const FInputActionValue& Value)
 	if (CurrentState == ECurrentState::Battle || CurrentState == ECurrentState::Guard)
 	{
 		SetCurrentState(ECurrentState::No_Battle);
+		UpdateMoveSpeed();
 		GetCharacterMovement()->bOrientRotationToMovement = true;
 	}
 }
@@ -114,6 +119,7 @@ void AInGamePlayer::GuardStart(const FInputActionValue& Value)
 	if (CurrentState == ECurrentState::Battle)
 	{
 		SetCurrentState(ECurrentState::Guard);
+		UpdateMoveSpeed();
 	}
 }
 
@@ -122,13 +128,75 @@ void AInGamePlayer::GuardEnd(const FInputActionValue& Value)
 	if (CurrentState == ECurrentState::Guard)
 	{
 		SetCurrentState(ECurrentState::Battle);
+		UpdateMoveSpeed();
 	}
+}
+
+void AInGamePlayer::Roll(const FInputActionValue& Value)
+{
+	if (CurrentMoveState == EMoveState::Idle)
+	{
+		if (CurrentState == ECurrentState::No_Battle)
+		{
+			PrevState = CurrentState;
+			SetCurrentState(ECurrentState::Rolling);
+		}
+		else
+		{
+			PrevState = ECurrentState::Battle;
+			SetCurrentState(ECurrentState::Rolling);
+		}
+	}
+}
+
+void AInGamePlayer::RunStart(const FInputActionValue& Value)
+{
+	CurrentMoveState = EMoveState::Run;
+	UpdateMoveSpeed();
+}
+
+void AInGamePlayer::RunEnd(const FInputActionValue& Value)
+{
+	CurrentMoveState = EMoveState::Idle;
+	UpdateMoveSpeed();
 }
 
 void AInGamePlayer::SetCurrentState(ECurrentState NewState)
 {
 	CurrentState = NewState;
 	OnStateChanged.ExecuteIfBound(NewState);
+}
+
+void AInGamePlayer::UpdateMoveSpeed()
+{
+	switch (CurrentState)
+	{
+	case ECurrentState::No_Battle:
+		if (CurrentMoveState == EMoveState::Idle)
+		{
+			GetCharacterMovement()->MaxWalkSpeed = 300.0f;
+		}
+		else if (CurrentMoveState == EMoveState::Run)
+		{
+			GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+		}
+		break;
+
+	case ECurrentState::Battle:
+		if (CurrentMoveState == EMoveState::Idle)
+		{
+			GetCharacterMovement()->MaxWalkSpeed = 225.0f;
+		}
+		else if (CurrentMoveState == EMoveState::Run)
+		{
+			GetCharacterMovement()->MaxWalkSpeed = 450.0f;
+		}
+		break;
+
+	case ECurrentState::Guard:
+		GetCharacterMovement()->MaxWalkSpeed = 150.0f;
+		break;
+	}
 }
 
 void AInGamePlayer::BasicCheckComboAttack()
@@ -194,6 +262,7 @@ void AInGamePlayer::PlayBasicComboAttackMontage()
 					PlayingBasicComboAttackIndex = 0;
 					bIsBasicAttacking = false;
 					SetCurrentState(ECurrentState::Battle);
+					UpdateMoveSpeed();
 				}
 				});
 			AnimInstance->Montage_SetEndDelegate(EndDelegate);

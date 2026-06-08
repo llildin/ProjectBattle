@@ -83,6 +83,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputAction> IA_Guard;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	TObjectPtr<UInputAction> IA_Roll;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	TObjectPtr<UInputAction> IA_Run;
+
 
 	//Input 호출 함수
 	void Move(const FInputActionValue& Value);
@@ -95,15 +101,27 @@ public:
 
 	void GuardEnd(const FInputActionValue& Value);
 
+	void Roll(const FInputActionValue& Value);
+
+	void RunStart(const FInputActionValue& Value);
+
+	void RunEnd(const FInputActionValue& Value);
+
 
 	//Player 상태
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
 	ECurrentState CurrentState = ECurrentState::No_Battle;
 
+	ECurrentState PrevState = ECurrentState::No_Battle;
+
+	EMoveState CurrentMoveState = EMoveState::Idle;
+
 	DECLARE_DELEGATE_OneParam(FOnStateChanged, ECurrentState)
 	FOnStateChanged OnStateChanged;
 
 	void SetCurrentState(ECurrentState NewState);
+
+	void UpdateMoveSpeed();
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void BattleCameraSetting(FRotator StartRotator, FRotator EndRotator);
@@ -129,6 +147,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
 	uint8 PlayingBasicComboAttackIndex = 0;
+
+
 
 
 };
