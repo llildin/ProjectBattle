@@ -150,5 +150,12 @@ public:
 
 
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
+	TObjectPtr<UAnimMontage> RollingMontage;
+
+	void Rolling();
+
+	FName GetRollingSectionName(float Direction);
+
 
 };

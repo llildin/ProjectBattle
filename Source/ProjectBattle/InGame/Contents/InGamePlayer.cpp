@@ -10,6 +10,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "KismetAnimationLibrary.h"
 
 // Sets default values
 AInGamePlayer::AInGamePlayer()
@@ -140,11 +141,13 @@ void AInGamePlayer::Roll(const FInputActionValue& Value)
 		{
 			PrevState = CurrentState;
 			SetCurrentState(ECurrentState::Rolling);
+			Rolling();
 		}
-		else
+		else if(CurrentState != ECurrentState::Rolling && CurrentState != ECurrentState::On_Damaged)
 		{
 			PrevState = ECurrentState::Battle;
 			SetCurrentState(ECurrentState::Rolling);
+			Rolling();
 		}
 	}
 }
@@ -268,5 +271,49 @@ void AInGamePlayer::PlayBasicComboAttackMontage()
 			AnimInstance->Montage_SetEndDelegate(EndDelegate);
 		}
 	}
+}
+
+void AInGamePlayer::Rolling()
+{
+	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+	{
+		float Direction = UKismetAnimationLibrary::CalculateDirection(GetCharacterMovement()->Velocity, GetActorRotation());
+
+		FName SectionName = GetRollingSectionName(Direction);
+		float MontageLength = PlayAnimMontage(RollingMontage, 1.0f, SectionName);
+
+		if (MontageLength > 0)
+		{
+			FOnMontageEnded EndDelegate;
+
+			EndDelegate.BindLambda([this](UAnimMontage* Montage, bool bInterrupted) {
+				if (!bInterrupted)
+				{
+					SetCurrentState(PrevState);
+				}
+				});
+			AnimInstance->Montage_SetEndDelegate(EndDelegate);
+		}
+	}
+}
+
+FName AInGamePlayer::GetRollingSectionName(float Direction)
+{
+	if (Direction >= -22.5f && Direction < 22.5f)   
+		return FName("Forward");
+	if (Direction >= 22.5f && Direction < 67.5f)    
+		return FName("Forward_Right");
+	if (Direction >= 67.5f && Direction < 112.5f)   
+		return FName("Right");
+	if (Direction >= 112.5f && Direction < 157.5f)                         
+		return FName("Backward_Right");
+	if (Direction >= -67.5f && Direction < -22.5f)  
+		return FName("Forward_Left");
+	if (Direction >= -112.5f && Direction < -67.5f) 
+		return FName("Left");
+	if (Direction >= -157.5f && Direction < -112.5f)
+		return FName("Backward_Left");
+
+	return FName("Backward");
 }
 
