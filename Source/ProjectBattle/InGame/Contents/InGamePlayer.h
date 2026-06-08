@@ -157,5 +157,7 @@ public:
 
 	FName GetRollingSectionName(float Direction);
 
+	FVector LastInputVector;
+
 
 };

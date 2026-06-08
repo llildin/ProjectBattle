@@ -91,9 +91,25 @@ void AInGamePlayer::Move(const FInputActionValue& Value)
 
 		FVector CameraRightInFloor = UKismetMathLibrary::GetRightVector(CameraRotaitionInFloor);
 
+		LastInputVector = CameraForwardInFloor * Direction.X + CameraRightInFloor * Direction.Y;
+
 		AddMovementInput(CameraForwardInFloor * Direction.X);
 
 		AddMovementInput(CameraRightInFloor * Direction.Y);
+	}
+	else if (CurrentState == ECurrentState::Attack)
+	{
+		FVector2D Direction = Value.Get<FVector2D>();
+
+		FRotator CameraRotation = GetControlRotation();
+
+		FRotator CameraRotaitionInFloor = FRotator(0, CameraRotation.Yaw, 0);
+
+		FVector CameraForwardInFloor = UKismetMathLibrary::GetForwardVector(CameraRotaitionInFloor);
+
+		FVector CameraRightInFloor = UKismetMathLibrary::GetRightVector(CameraRotaitionInFloor);
+
+		LastInputVector = CameraForwardInFloor * Direction.X + CameraRightInFloor * Direction.Y;
 	}
 }
 
@@ -269,9 +285,17 @@ void AInGamePlayer::PlayBasicComboAttackMontage()
 
 void AInGamePlayer::Rolling()
 {
-	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+	if (bIsBasicAttacking)
 	{
-		float Direction = UKismetAnimationLibrary::CalculateDirection(GetCharacterMovement()->Velocity, GetActorRotation());
+		StopAnimMontage(BasicComboAttackMontage);
+		BasicComboAttackCount = 0;
+		PlayingBasicComboAttackIndex = 0;
+		bIsBasicAttacking = false;
+	}
+
+	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+	{		
+		float Direction = UKismetAnimationLibrary::CalculateDirection(LastInputVector, GetActorRotation());
 
 		FName SectionName = GetRollingSectionName(Direction);
 		float MontageLength = PlayAnimMontage(RollingMontage, 1.0f, SectionName);
