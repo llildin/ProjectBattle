@@ -149,7 +149,7 @@ public:
 	uint8 PlayingBasicComboAttackIndex = 0;
 
 
-
+	//Rolling
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
 	TObjectPtr<UAnimMontage> RollingMontage;
 
@@ -159,5 +159,8 @@ public:
 
 	FVector LastInputVector;
 
+
+	//BasicAttackTrace
+	void BasicAttackTrace();
 
 };

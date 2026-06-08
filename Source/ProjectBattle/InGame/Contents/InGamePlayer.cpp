@@ -335,3 +335,8 @@ FName AInGamePlayer::GetRollingSectionName(float Direction)
 	return FName("Backward");
 }
 
+void AInGamePlayer::BasicAttackTrace()
+{
+
+}
+
