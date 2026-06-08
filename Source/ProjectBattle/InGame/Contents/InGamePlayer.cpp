@@ -110,7 +110,6 @@ void AInGamePlayer::No_Battle(const FInputActionValue& Value)
 	if (CurrentState == ECurrentState::Battle || CurrentState == ECurrentState::Guard)
 	{
 		SetCurrentState(ECurrentState::No_Battle);
-		UpdateMoveSpeed();
 		GetCharacterMovement()->bOrientRotationToMovement = true;
 	}
 }
@@ -120,7 +119,6 @@ void AInGamePlayer::GuardStart(const FInputActionValue& Value)
 	if (CurrentState == ECurrentState::Battle)
 	{
 		SetCurrentState(ECurrentState::Guard);
-		UpdateMoveSpeed();
 	}
 }
 
@@ -129,26 +127,22 @@ void AInGamePlayer::GuardEnd(const FInputActionValue& Value)
 	if (CurrentState == ECurrentState::Guard)
 	{
 		SetCurrentState(ECurrentState::Battle);
-		UpdateMoveSpeed();
 	}
 }
 
 void AInGamePlayer::Roll(const FInputActionValue& Value)
 {
-	if (CurrentMoveState == EMoveState::Idle)
+	if (CurrentState == ECurrentState::No_Battle)
 	{
-		if (CurrentState == ECurrentState::No_Battle)
-		{
-			PrevState = CurrentState;
-			SetCurrentState(ECurrentState::Rolling);
-			Rolling();
-		}
-		else if(CurrentState != ECurrentState::Rolling && CurrentState != ECurrentState::On_Damaged)
-		{
-			PrevState = ECurrentState::Battle;
-			SetCurrentState(ECurrentState::Rolling);
-			Rolling();
-		}
+		PrevState = CurrentState;
+		SetCurrentState(ECurrentState::Rolling);
+		Rolling();
+	}
+	else if (CurrentState != ECurrentState::Rolling && CurrentState != ECurrentState::On_Damaged)
+	{
+		PrevState = ECurrentState::Battle;
+		SetCurrentState(ECurrentState::Rolling);
+		Rolling();
 	}
 }
 
@@ -168,6 +162,7 @@ void AInGamePlayer::SetCurrentState(ECurrentState NewState)
 {
 	CurrentState = NewState;
 	OnStateChanged.ExecuteIfBound(NewState);
+	UpdateMoveSpeed();
 }
 
 void AInGamePlayer::UpdateMoveSpeed()
@@ -265,7 +260,6 @@ void AInGamePlayer::PlayBasicComboAttackMontage()
 					PlayingBasicComboAttackIndex = 0;
 					bIsBasicAttacking = false;
 					SetCurrentState(ECurrentState::Battle);
-					UpdateMoveSpeed();
 				}
 				});
 			AnimInstance->Montage_SetEndDelegate(EndDelegate);
