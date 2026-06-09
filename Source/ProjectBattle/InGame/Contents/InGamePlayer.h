@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "InputActionValue.h"
+#include "Sturcture_AttackData.h"
 
 #include "InGamePlayer.generated.h"
 
@@ -148,6 +149,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
 	uint8 PlayingBasicComboAttackIndex = 0;
 
+	FString AttackSectionName;
+
 
 	//Rolling
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
@@ -162,5 +165,11 @@ public:
 
 	//BasicAttackTrace
 	void BasicAttackTrace();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void TestAttackEvent();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
+	TObjectPtr<UDataTable> DT_AttackData;
 
 };

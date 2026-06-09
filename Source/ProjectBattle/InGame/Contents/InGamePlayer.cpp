@@ -261,9 +261,9 @@ void AInGamePlayer::PlayBasicComboAttackMontage()
 {
 	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
 	{
-		FString SectionName = FString::Printf(TEXT("BasicAttack0%d"), BasicComboAttackCount);
+		AttackSectionName = FString::Printf(TEXT("BasicAttack0%d"), BasicComboAttackCount);
 
-		float MontageLength = PlayAnimMontage(BasicComboAttackMontage, 1.0f, FName(SectionName));
+		float MontageLength = PlayAnimMontage(BasicComboAttackMontage, 1.0f, FName(AttackSectionName));
 
 		if (MontageLength > 0)
 		{
@@ -337,6 +337,9 @@ FName AInGamePlayer::GetRollingSectionName(float Direction)
 
 void AInGamePlayer::BasicAttackTrace()
 {
+	//TestAttackEvent();
+
+	FAttackData* AttackData = DT_AttackData->FindRow<FAttackData>(FName(AttackSectionName), TEXT(""));
 
 }
 
