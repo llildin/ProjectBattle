@@ -172,4 +172,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
 	TObjectPtr<UDataTable> DT_AttackData;
 
+	FVector GetTraceLocation(FVector Offset);
+
 };

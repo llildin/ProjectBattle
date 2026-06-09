@@ -9,6 +9,7 @@
 #include "EnhancedInputComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "KismetAnimationLibrary.h"
 
@@ -337,9 +338,46 @@ FName AInGamePlayer::GetRollingSectionName(float Direction)
 
 void AInGamePlayer::BasicAttackTrace()
 {
-	//TestAttackEvent();
+	if (DT_AttackData == nullptr)
+	{
+		return;
+	}
 
 	FAttackData* AttackData = DT_AttackData->FindRow<FAttackData>(FName(AttackSectionName), TEXT(""));
 
+	FVector StartLocation = GetTraceLocation(AttackData->StartOffset);
+	FVector EndLocation = GetTraceLocation(AttackData->EndOffset);
+
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
+
+	TArray<FHitResult> OutHits;
+
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
+
+	bool bTraceHit = UKismetSystemLibrary::SphereTraceMultiForObjects(
+		GetWorld(),
+		StartLocation,
+		EndLocation,
+		30.0f,
+		ObjectTypes,
+		false,      
+		ActorsToIgnore,
+		EDrawDebugTrace::ForDuration,
+		OutHits,
+		true                   
+	);
+
+}
+
+FVector AInGamePlayer::GetTraceLocation(FVector Offset)
+{
+	FVector TraceLocation = GetActorLocation() +
+		GetActorForwardVector() * Offset.X +
+		GetActorRightVector() * Offset.Y +
+		GetActorUpVector() * Offset.Z;
+
+	return TraceLocation;
 }
 
