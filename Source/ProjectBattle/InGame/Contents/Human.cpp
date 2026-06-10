@@ -33,10 +33,3 @@ void AHuman::Tick(float DeltaTime)
 
 }
 
-// Called to bind functionality to input
-void AHuman::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-}
-

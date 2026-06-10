@@ -13,6 +13,7 @@ class USpringArmComponent;
 class UCameraComponent;
 class UInputAction;
 class UStaticMeshComponent;
+class AInGamePlayerController;
 
 UENUM(BlueprintType)
 enum class EMoveState : uint8
@@ -30,7 +31,8 @@ enum class ECurrentState : uint8
 	Guard = 20 UMETA(DisplayName = "Guard"),
 	Attack = 30 UMETA(DisplayName = "Attack"),
 	On_Damaged = 40 UMETA(DisplayName = "On_Damaged"),
-	Rolling = 50 UMETA(DisplayName = "Rolling")
+	Rolling = 50 UMETA(DisplayName = "Rolling"),
+	Interact = 60 UMETA(DisplayName = "Rolling")
 };
 
 UCLASS()
@@ -90,6 +92,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputAction> IA_Run;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	TObjectPtr<UInputAction> IA_Interact;
+
+	
+	AInGamePlayerController* Controller;
+
 
 	//Input 호출 함수
 	void Move(const FInputActionValue& Value);
@@ -107,6 +115,8 @@ public:
 	void RunStart(const FInputActionValue& Value);
 
 	void RunEnd(const FInputActionValue& Value);
+
+	void Interact(const FInputActionValue& Value);
 
 
 	//Player 상태
@@ -173,5 +183,9 @@ public:
 	TObjectPtr<UDataTable> DT_AttackData;
 
 	FVector GetTraceLocation(FVector Offset);
+
+
+	//NPC Setting
+	bool bIsNPCSetting = false;
 
 };

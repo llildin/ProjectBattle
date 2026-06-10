@@ -12,6 +12,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "KismetAnimationLibrary.h"
+#include "InGamePlayerController.h"
 
 // Sets default values
 AInGamePlayer::AInGamePlayer()
@@ -41,7 +42,8 @@ AInGamePlayer::AInGamePlayer()
 void AInGamePlayer::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	Controller = Cast<AInGamePlayerController>(GetController());
 }
 
 // Called every frame
@@ -75,6 +77,8 @@ void AInGamePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		UIC->BindAction(IA_Roll, ETriggerEvent::Started, this, &AInGamePlayer::Roll);
 		UIC->BindAction(IA_Run, ETriggerEvent::Started, this, &AInGamePlayer::RunStart);
 		UIC->BindAction(IA_Run, ETriggerEvent::Completed, this, &AInGamePlayer::RunEnd);
+
+		UIC->BindAction(IA_Interact, ETriggerEvent::Started, this, &AInGamePlayer::Interact);
 	}
 }
 
@@ -175,6 +179,16 @@ void AInGamePlayer::RunEnd(const FInputActionValue& Value)
 	UpdateMoveSpeed();
 }
 
+void AInGamePlayer::Interact(const FInputActionValue& Value)
+{
+	if (bIsNPCSetting)
+	{
+		Controller->NPCSettingInteract();
+
+		GetMovementComponent()->StopMovementImmediately();
+	}
+}
+
 void AInGamePlayer::SetCurrentState(ECurrentState NewState)
 {
 	CurrentState = NewState;
@@ -270,13 +284,13 @@ void AInGamePlayer::PlayBasicComboAttackMontage()
 		{
 			FOnMontageEnded EndDelegate;
 
-			EndDelegate.BindLambda([this](UAnimMontage* Montage, bool bInterrupted) {
-				if (!bInterrupted)
+			EndDelegate.BindLambda([WeakThis = TWeakObjectPtr<AInGamePlayer>(this)](UAnimMontage* Montage, bool bInterrupted) {
+				if (!bInterrupted && WeakThis.IsValid())
 				{
-					BasicComboAttackCount = 0;
-					PlayingBasicComboAttackIndex = 0;
-					bIsBasicAttacking = false;
-					SetCurrentState(ECurrentState::Battle);
+					WeakThis->BasicComboAttackCount = 0;
+					WeakThis->PlayingBasicComboAttackIndex = 0;
+					WeakThis->bIsBasicAttacking = false;
+					WeakThis->SetCurrentState(ECurrentState::Battle);
 				}
 				});
 			AnimInstance->Montage_SetEndDelegate(EndDelegate);
@@ -305,10 +319,10 @@ void AInGamePlayer::Rolling()
 		{
 			FOnMontageEnded EndDelegate;
 
-			EndDelegate.BindLambda([this](UAnimMontage* Montage, bool bInterrupted) {
-				if (!bInterrupted)
+			EndDelegate.BindLambda([WeakThis = TWeakObjectPtr<AInGamePlayer>(this)](UAnimMontage* Montage, bool bInterrupted) {
+				if (!bInterrupted && WeakThis.IsValid())
 				{
-					SetCurrentState(PrevState);
+					WeakThis->SetCurrentState(WeakThis->PrevState);
 				}
 				});
 			AnimInstance->Montage_SetEndDelegate(EndDelegate);

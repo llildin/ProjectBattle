@@ -4,9 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+
 #include "Human.generated.h"
 
 class UStaticMeshComponent;
+
+UENUM(BlueprintType)
+enum class NPC_CurrentState : uint8
+{
+	Idle = 0 UMETA(DisplayName = "Idle"),
+	BasicAttack = 10 UMETA(DisplayName = "BasicAttack"),
+	Guard = 20 UMETA(DisplayName = "Guard"),
+};
 
 UCLASS()
 class PROJECTBATTLE_API AHuman : public ACharacter
@@ -24,9 +33,6 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UStaticMeshComponent> Katana;

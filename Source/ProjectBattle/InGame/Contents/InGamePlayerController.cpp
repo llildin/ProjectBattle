@@ -4,6 +4,8 @@
 #include "InGame/Contents/InGamePlayerController.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputMappingContext.h"
+#include "NPCSetting.h"
+#include "InGameBaseUI.h"
 
 void AInGamePlayerController::OnPossess(APawn* aPawn)
 {
@@ -40,3 +42,42 @@ void AInGamePlayerController::OnUnPossess()
     }
 }
 
+void AInGamePlayerController::BeginPlay()
+{
+    Super::BeginPlay();
+
+    if (IsLocalPlayerController())
+    {
+        InGameBaseUIObject = CreateWidget<UInGameBaseUI>(this, InGameBaseUIClass);
+        InGameBaseUIObject->AddToViewport();
+        InGameBaseUIObject->SetVisibility(ESlateVisibility::Visible);
+
+        NPCSettingObject = CreateWidget<UNPCSetting>(this, NPCSettingClass);
+        NPCSettingObject->AddToViewport();
+        NPCSettingObject->SetVisibility(ESlateVisibility::Collapsed);
+
+        bShowMouseCursor = false;
+        SetInputMode(FInputModeGameOnly());
+
+
+        NPCSettingObject->OnCloseUI.BindLambda([this]()
+            {
+                InGameBaseUIObject->SetVisibility(ESlateVisibility::Visible);
+                NPCSettingObject->SetVisibility(ESlateVisibility::Collapsed);
+
+                bShowMouseCursor = false;
+                SetInputMode(FInputModeGameOnly());
+
+                
+            });
+    }
+}
+
+void AInGamePlayerController::NPCSettingInteract()
+{
+        InGameBaseUIObject->SetVisibility(ESlateVisibility::Collapsed);
+        NPCSettingObject->SetVisibility(ESlateVisibility::Visible);
+
+        bShowMouseCursor = true;
+        SetInputMode(FInputModeUIOnly());
+}

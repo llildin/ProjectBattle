@@ -3,3 +3,9 @@
 
 #include "InGame/Contents/AttackPracticeNPC.h"
 
+void AAttackPracticeNPC::BeginPlay()
+{
+	Super::BeginPlay();
+
+
+}
