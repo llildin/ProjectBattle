@@ -162,6 +162,18 @@ public:
 	FString AttackSectionName;
 
 
+	//Test
+	FRotator TargetAttackRotation;
+
+	bool bIsComboRotating = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
+	float ComboRotationSpeed = 0;
+
+	UFUNCTION()
+	void OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
+
 	//Rolling
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
 	TObjectPtr<UAnimMontage> RollingMontage;
