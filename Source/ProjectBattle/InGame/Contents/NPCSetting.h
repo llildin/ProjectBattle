@@ -7,6 +7,8 @@
 #include "NPCSetting.generated.h"
 
 class UButton;
+class UComboBoxString;
+class AAttackPracticeNPC;
 
 /**
  * 
@@ -22,9 +24,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (BindWidget))
 	TObjectPtr<UButton> Btn_Close;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (BindWidget))
+	TObjectPtr<UComboBoxString> SelectStateBox;
+
 	UFUNCTION()
 	void OnClickedCloseButton();
 
 	DECLARE_DELEGATE(FOnCloseUI)
 	FOnCloseUI OnCloseUI;
+
+
+	//Set NPC
+	AAttackPracticeNPC* NPC;
+
 };

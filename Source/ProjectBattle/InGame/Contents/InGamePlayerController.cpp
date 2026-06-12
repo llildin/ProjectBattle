@@ -59,7 +59,6 @@ void AInGamePlayerController::BeginPlay()
         bShowMouseCursor = false;
         SetInputMode(FInputModeGameOnly());
 
-
         NPCSettingObject->OnCloseUI.BindLambda([this]()
             {
                 InGameBaseUIObject->SetVisibility(ESlateVisibility::Visible);
@@ -67,17 +66,15 @@ void AInGamePlayerController::BeginPlay()
 
                 bShowMouseCursor = false;
                 SetInputMode(FInputModeGameOnly());
-
-                
             });
     }
 }
 
 void AInGamePlayerController::NPCSettingInteract()
 {
-        InGameBaseUIObject->SetVisibility(ESlateVisibility::Collapsed);
-        NPCSettingObject->SetVisibility(ESlateVisibility::Visible);
+    InGameBaseUIObject->SetVisibility(ESlateVisibility::Collapsed);
+    NPCSettingObject->SetVisibility(ESlateVisibility::Visible);
 
-        bShowMouseCursor = true;
-        SetInputMode(FInputModeUIOnly());
+    bShowMouseCursor = true;
+    SetInputMode(FInputModeUIOnly());
 }

@@ -7,6 +7,15 @@
 
 #include "AttackPracticeNPC.generated.h"
 
+UENUM(BlueprintType)
+enum class ENPCState : uint8
+{
+	Idle = 0 UMETA(DisplayName = "Idle"),
+	On_Damaged = 10 UMETA(DisplayName = "On_Damaged"),
+	Guard = 20 UMETA(DisplayName = "Guard"),
+	BasicAttack = 30 UMETA(DisPlayName = "BasicAttack")
+};
+
 /**
  * 
  */
@@ -20,5 +29,9 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+
+	//NPC Setting
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	ENPCState CurrentState = ENPCState::Idle;
 
 };
