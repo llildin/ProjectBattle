@@ -318,6 +318,7 @@ void AInGamePlayer::PlayBasicComboAttackMontage()
 					WeakThis->BasicComboAttackCount = 0;
 					WeakThis->PlayingBasicComboAttackIndex = 0;
 					WeakThis->bIsBasicAttacking = false;
+					WeakThis->bUseControllerRotationYaw = false;
 					WeakThis->SetCurrentState(ECurrentState::Battle);
 				}
 				});
