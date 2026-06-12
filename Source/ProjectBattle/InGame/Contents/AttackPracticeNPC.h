@@ -36,4 +36,7 @@ public:
 
 	void SetState(ENPCState State);
 
+	DECLARE_DELEGATE_OneParam(FOnStateChanged, ENPCState)
+	FOnStateChanged OnStateChanged;
+
 };

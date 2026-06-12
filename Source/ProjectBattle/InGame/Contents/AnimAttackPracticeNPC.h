@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+
+#include "AttackPracticeNPC.h"
+
 #include "AnimAttackPracticeNPC.generated.h"
 
 /**
@@ -14,4 +17,20 @@ class PROJECTBATTLE_API UAnimAttackPracticeNPC : public UAnimInstance
 {
 	GENERATED_BODY()
 	
+public:
+
+	virtual void NativeInitializeAnimation() override;
+
+	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+
+	virtual void NativeThreadSafeUpdateAnimation(float DeltaSeconds) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	ENPCState CurrentState = ENPCState::Idle;
+
+	void OnCurrentStateChanged(ENPCState NewState);
+
+	AAttackPracticeNPC* NPC;
+
+
 };
