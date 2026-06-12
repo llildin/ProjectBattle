@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "InGame/Contents/InGamePlayer.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
@@ -52,16 +51,13 @@ void AInGamePlayer::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 
-	// 연계 공격 버튼을 눌러 회전이 필요한 상태일 때만 작동
 	if (bIsComboRotating)
 	{
 		FRotator CurrentRot = GetActorRotation();
 
-		// 1타 회전값(현재) -> 2타 회전값(목표)으로 부드럽게 보간
 		FRotator NewRot = FMath::RInterpTo(CurrentRot, TargetAttackRotation, DeltaTime, ComboRotationSpeed);
 		SetActorRotation(NewRot);
 
-		// 목표치에 거의 도달했다면 틱 회전을 멈춰서 최적화 (오차범위 1도 이내)
 		if (CurrentRot.Equals(TargetAttackRotation, 1.0f))
 		{
 			bIsComboRotating = false;
@@ -101,7 +97,7 @@ void AInGamePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 void AInGamePlayer::Move(const FInputActionValue& Value)
 {
-	if (CurrentState != ECurrentState::Attack && CurrentState != ECurrentState::On_Damaged && CurrentState != ECurrentState::Rolling)
+	if (CurrentState == ECurrentState::No_Battle || CurrentState == ECurrentState::Battle || CurrentState == ECurrentState::Guard)
 	{
 		FVector2D Direction = Value.Get<FVector2D>();
 
@@ -198,11 +194,10 @@ void AInGamePlayer::RunEnd(const FInputActionValue& Value)
 
 void AInGamePlayer::Interact(const FInputActionValue& Value)
 {
-	if (bIsNPCSetting)
+	if (bIsNPCSetting && (CurrentState == ECurrentState::No_Battle || CurrentState == ECurrentState::Battle))
 	{
+		PrevState = CurrentState;
 		Controller->NPCSettingInteract();
-
-		GetMovementComponent()->StopMovementImmediately();
 	}
 }
 
@@ -249,20 +244,13 @@ void AInGamePlayer::BasicCheckComboAttack()
 {
 	if (PlayingBasicComboAttackIndex != BasicComboAttackCount)
 	{
-		// 1. 공격 입력이 들어온 '그 순간'의 카메라(컨트롤러) Yaw값 저장
 		FRotator CameraRot = GetControlRotation();
 		TargetAttackRotation = FRotator(0.f, CameraRot.Yaw, 0.f);
 
-		// 2. 부드러운 회전을 방해하는 기본 카메라 동기화 옵션을 잠시 끕니다.
 		bUseControllerRotationYaw = false;
 
-		// 3. 틱에서 회전 로직을 가동하도록 플래그 오픈
 		bIsComboRotating = true;
 
-		// 4. 다음 공격 몽타주 재생 로직...
-		// PlayAnimMontage(AttackMontage_2);
-
-		// 5. [중요] 몽타주가 끝났을 때 다시 카메라 동기화를 켜주기 위해 델리게이트 등록
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		if (AnimInstance)
 		{
@@ -340,11 +328,9 @@ void AInGamePlayer::PlayBasicComboAttackMontage()
 
 void AInGamePlayer::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 {
-	// 공격이 끝나면 다시 평소처럼 카메라 방향을 즉시 바라보도록 복구
 	bUseControllerRotationYaw = true;
 	bIsComboRotating = false;
 
-	// 메모리 누수 방지를 위해 사용한 델리게이트 해제
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance)
 	{

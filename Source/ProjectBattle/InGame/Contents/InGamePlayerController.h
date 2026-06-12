@@ -10,6 +10,7 @@
 class UInputMappingContext;
 class UNPCSetting;
 class UInGameBaseUI;
+class AInGamePlayer;
 
 /**
  * 
@@ -46,4 +47,6 @@ public:
 
 
 	void NPCSettingInteract();
+
+	AInGamePlayer* Player;
 };

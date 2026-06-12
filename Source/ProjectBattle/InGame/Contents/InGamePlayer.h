@@ -32,7 +32,7 @@ enum class ECurrentState : uint8
 	Attack = 30 UMETA(DisplayName = "Attack"),
 	On_Damaged = 40 UMETA(DisplayName = "On_Damaged"),
 	Rolling = 50 UMETA(DisplayName = "Rolling"),
-	Interact = 60 UMETA(DisplayName = "Rolling")
+	Interact = 60 UMETA(DisplayName = "Interact")
 };
 
 UCLASS()

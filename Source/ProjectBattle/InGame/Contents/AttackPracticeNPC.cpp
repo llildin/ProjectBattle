@@ -9,3 +9,8 @@ void AAttackPracticeNPC::BeginPlay()
 
 
 }
+
+void AAttackPracticeNPC::SetState(ENPCState State)
+{
+	CurrentState = State;
+}

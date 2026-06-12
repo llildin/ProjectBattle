@@ -6,6 +6,7 @@
 #include "InputMappingContext.h"
 #include "NPCSetting.h"
 #include "InGameBaseUI.h"
+#include "InGamePlayer.h"
 
 void AInGamePlayerController::OnPossess(APawn* aPawn)
 {
@@ -24,6 +25,8 @@ void AInGamePlayerController::OnPossess(APawn* aPawn)
                 Subsystem->AddMappingContext(IMC.LoadSynchronous(), 0);
             }
         }
+
+        Player = Cast<AInGamePlayer>(aPawn);
     }
 }
 
@@ -66,6 +69,8 @@ void AInGamePlayerController::BeginPlay()
 
                 bShowMouseCursor = false;
                 SetInputMode(FInputModeGameOnly());
+
+                Player->SetCurrentState(Player->PrevState);
             });
     }
 }
@@ -74,6 +79,8 @@ void AInGamePlayerController::NPCSettingInteract()
 {
     InGameBaseUIObject->SetVisibility(ESlateVisibility::Collapsed);
     NPCSettingObject->SetVisibility(ESlateVisibility::Visible);
+
+    Player->SetCurrentState(ECurrentState::Interact);
 
     bShowMouseCursor = true;
     SetInputMode(FInputModeUIOnly());

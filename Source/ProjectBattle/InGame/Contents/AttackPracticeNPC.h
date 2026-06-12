@@ -34,4 +34,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
 	ENPCState CurrentState = ENPCState::Idle;
 
+	void SetState(ENPCState State);
+
 };
