@@ -9,6 +9,18 @@
 
 class UStaticMeshComponent;
 
+UENUM(BlueprintType)
+enum class ECurrentState : uint8
+{
+	No_Battle = 0 UMETA(DisplayName = "No_Battle"),
+	Battle = 10 UMETA(DisplayName = "Battle"),
+	Guard = 20 UMETA(DisplayName = "Guard"),
+	Attack = 30 UMETA(DisplayName = "Attack"),
+	On_Damaged = 40 UMETA(DisplayName = "On_Damaged"),
+	Rolling = 50 UMETA(DisplayName = "Rolling"),
+	Interact = 60 UMETA(DisplayName = "Interact")
+};
+
 UCLASS()
 class PROJECTBATTLE_API AHuman : public ACharacter
 {
@@ -29,5 +41,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UStaticMeshComponent> Katana;
 
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stat")
+	uint8 Hp = 100;
 };
