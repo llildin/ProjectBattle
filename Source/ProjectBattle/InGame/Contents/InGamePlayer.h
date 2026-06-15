@@ -186,15 +186,11 @@ public:
 
 
 	//BasicAttackTrace
-	void BasicAttackTrace();
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void TestAttackEvent();
+	void BasicAttackTrace();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
 	TObjectPtr<UDataTable> DT_AttackData;
-
-	FVector GetTraceLocation(FVector Offset);
 
 
 	//NPC Setting
