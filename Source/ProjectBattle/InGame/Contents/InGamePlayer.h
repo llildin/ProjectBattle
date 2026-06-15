@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "InGame/Contents/Human.h"
 #include "InputActionValue.h"
 #include "Sturcture_AttackData.h"
 
@@ -36,7 +36,7 @@ enum class ECurrentState : uint8
 };
 
 UCLASS()
-class PROJECTBATTLE_API AInGamePlayer : public ACharacter
+class PROJECTBATTLE_API AInGamePlayer : public AHuman
 {
 	GENERATED_BODY()
 
@@ -60,9 +60,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UCameraComponent> Camera;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	TObjectPtr<UStaticMeshComponent> Katana;
 
 
 

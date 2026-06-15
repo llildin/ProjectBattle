@@ -26,14 +26,7 @@ AInGamePlayer::AInGamePlayer()
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
-
-	Katana = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Katana"));
-	Katana->SetupAttachment(GetMesh(), TEXT("Katana_Socket"));
-
-	GetMesh()->SetRelativeLocationAndRotation(
-		FVector(0, 0, -GetCapsuleComponent()->GetScaledCapsuleHalfHeight()),
-		FRotator(0, -90.f, 0)
-	);
+	
 
 	GetCharacterMovement()->MaxWalkSpeed = 300.0f;
 }
