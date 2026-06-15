@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "InGame/Contents/Human.h"
+#include "Sturcture_AttackData.h"
 
 #include "AttackPracticeNPC.generated.h"
 
@@ -39,4 +40,22 @@ public:
 	DECLARE_DELEGATE_OneParam(FOnStateChanged, ENPCState)
 	FOnStateChanged OnStateChanged;
 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+	TObjectPtr<UAnimMontage> AttackMontage;
+
+	int32 NPCComboCount = 0;
+	bool bIsNPCAttacking = false;
+	FString AttackSectionName;
+
+	void StartNPCBasicComboAttack();
+
+	void NPCCheckBasicComboAttack();
+
+	void PlayNPCBasicComboAttackMontage();
+
+	void NPCBasicAttackTrace();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
+	TObjectPtr<UDataTable> DT_AttackData;
 };

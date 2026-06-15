@@ -19,12 +19,6 @@ class PROJECTBATTLE_API UAnimyNotify_BasicAttackCheck : public UAnimNotify
 		return TEXT("AttackCheck_CPP");
 	}
 
-	UPROPERTY(EditAnywhere)
-	float TraceRadius = 50.0f; 
-
-	UPROPERTY(EditAnywhere)
-	float Damage = 10.0f;
-
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
 
 };

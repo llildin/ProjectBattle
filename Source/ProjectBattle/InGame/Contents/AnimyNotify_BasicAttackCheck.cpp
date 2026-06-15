@@ -3,14 +3,21 @@
 
 #include "InGame/Contents/AnimyNotify_BasicAttackCheck.h"
 #include "InGamePlayer.h"
+#include "AttackPracticeNPC.h"
 
 void UAnimyNotify_BasicAttackCheck::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
 	Super::Notify(MeshComp, Animation, EventReference);
 
-	AInGamePlayer* Pawn = Cast<AInGamePlayer>(MeshComp->GetOwner());
-	if (Pawn)
+	AInGamePlayer* Player = Cast<AInGamePlayer>(MeshComp->GetOwner());
+	if (Player)
 	{
-		Pawn->BasicAttackTrace();
+		Player->BasicAttackTrace();
+	}
+
+	AAttackPracticeNPC* NPC = Cast<AAttackPracticeNPC>(MeshComp->GetOwner());
+	if (NPC)
+	{
+		NPC->NPCBasicAttackTrace();
 	}
 }
