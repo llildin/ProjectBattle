@@ -24,11 +24,11 @@ void UNPCSetting::NativeConstruct()
 	}
 
 	SelectStateBox->ClearOptions();
-	SelectStateBox->AddOption(TEXT("Idle"));
+	SelectStateBox->AddOption(TEXT("Battle"));
 	SelectStateBox->AddOption(TEXT("BasicAttack"));
 	SelectStateBox->AddOption(TEXT("Guard"));
 
-	SelectStateBox->SetSelectedOption(TEXT("Idle"));
+	SelectStateBox->SetSelectedOption(TEXT("Battle"));
 }
 
 void UNPCSetting::OnClickedCloseButton()
@@ -36,9 +36,9 @@ void UNPCSetting::OnClickedCloseButton()
 	OnCloseUI.ExecuteIfBound();
 
 	FString SelectedState = SelectStateBox->GetSelectedOption();
-	const UEnum* EnumPtr = StaticEnum<ENPCState>();
-	FString StateName = FString::Printf(TEXT("ENPCState::%s"), *SelectedState);
+	const UEnum* EnumPtr = StaticEnum<ECurrentState>();
+	FString StateName = FString::Printf(TEXT("ECurrentState::%s"), *SelectedState);
 	int64 EnumValue = EnumPtr->GetValueByName(FName(*StateName));
 
-	NPC->SetState(static_cast<ENPCState>(EnumValue));
+	NPC->SetState(static_cast<ECurrentState>(EnumValue));
 }

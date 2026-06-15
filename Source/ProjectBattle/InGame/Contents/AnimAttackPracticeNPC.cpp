@@ -24,7 +24,7 @@ void UAnimAttackPracticeNPC::NativeThreadSafeUpdateAnimation(float DeltaSeconds)
 {
 }
 
-void UAnimAttackPracticeNPC::OnCurrentStateChanged(ENPCState NewState)
+void UAnimAttackPracticeNPC::OnCurrentStateChanged(ECurrentState NewState)
 {
 	CurrentState = NewState;
 }

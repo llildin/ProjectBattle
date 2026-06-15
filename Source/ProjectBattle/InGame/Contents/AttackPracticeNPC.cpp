@@ -11,7 +11,7 @@ void AAttackPracticeNPC::BeginPlay()
 	SetAnimRootMotionTranslationScale(0.0f);
 }
 
-void AAttackPracticeNPC::SetState(ENPCState State)
+void AAttackPracticeNPC::SetState(ECurrentState State)
 {
 	if (CurrentState == State)
 	{
@@ -21,7 +21,7 @@ void AAttackPracticeNPC::SetState(ENPCState State)
 	CurrentState = State;
 	OnStateChanged.ExecuteIfBound(State);
 
-	if (State == ENPCState::BasicAttack)
+	if (State == ECurrentState::BasicAttack)
 	{
 		bIsNPCAttacking = true;
 		StartNPCBasicComboAttack();

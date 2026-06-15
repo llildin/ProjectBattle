@@ -16,6 +16,7 @@ enum class ECurrentState : uint8
 	Battle = 10 UMETA(DisplayName = "Battle"),
 	Guard = 20 UMETA(DisplayName = "Guard"),
 	Attack = 30 UMETA(DisplayName = "Attack"),
+	BasicAttack = 31 UMETA(DisplayName = "BasicAttack"),
 	On_Damaged = 40 UMETA(DisplayName = "On_Damaged"),
 	Rolling = 50 UMETA(DisplayName = "Rolling"),
 	Interact = 60 UMETA(DisplayName = "Interact")

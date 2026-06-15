@@ -23,7 +23,6 @@ enum class EMoveState : uint8
 	Run = 20 UMETA(DisplayName = "Run")
 };
 
-
 UCLASS()
 class PROJECTBATTLE_API AInGamePlayer : public AHuman
 {

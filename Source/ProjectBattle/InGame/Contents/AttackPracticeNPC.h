@@ -8,14 +8,6 @@
 
 #include "AttackPracticeNPC.generated.h"
 
-UENUM(BlueprintType)
-enum class ENPCState : uint8
-{
-	Idle = 0 UMETA(DisplayName = "Idle"),
-	On_Damaged = 10 UMETA(DisplayName = "On_Damaged"),
-	Guard = 20 UMETA(DisplayName = "Guard"),
-	BasicAttack = 30 UMETA(DisPlayName = "BasicAttack")
-};
 
 /**
  * 
@@ -33,11 +25,11 @@ public:
 
 	//NPC Setting
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
-	ENPCState CurrentState = ENPCState::Idle;
+	ECurrentState CurrentState = ECurrentState::Battle;
 
-	void SetState(ENPCState State);
+	void SetState(ECurrentState State);
 
-	DECLARE_DELEGATE_OneParam(FOnStateChanged, ENPCState)
+	DECLARE_DELEGATE_OneParam(FOnStateChanged, ECurrentState)
 	FOnStateChanged OnStateChanged;
 
 

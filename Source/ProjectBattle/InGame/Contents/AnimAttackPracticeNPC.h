@@ -26,9 +26,9 @@ public:
 	virtual void NativeThreadSafeUpdateAnimation(float DeltaSeconds) override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
-	ENPCState CurrentState = ENPCState::Idle;
+	ECurrentState CurrentState = ECurrentState::Battle;
 
-	void OnCurrentStateChanged(ENPCState NewState);
+	void OnCurrentStateChanged(ECurrentState NewState);
 
 	AAttackPracticeNPC* NPC;
 
