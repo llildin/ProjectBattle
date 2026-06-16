@@ -13,6 +13,7 @@
 #include "KismetAnimationLibrary.h"
 #include "InGamePlayerController.h"
 #include "InGame/AttackFunction.h"
+#include "GameFramework/GameStateBase.h"
 
 // Sets default values
 AInGamePlayer::AInGamePlayer()
@@ -149,6 +150,7 @@ void AInGamePlayer::GuardStart(const FInputActionValue& Value)
 {
 	if (CurrentState == ECurrentState::Battle)
 	{
+		GuardStartTime = GetWorld()->GetGameState()->GetServerWorldTimeSeconds();
 		SetCurrentState(ECurrentState::Guard);
 	}
 }

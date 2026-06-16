@@ -3,6 +3,7 @@
 
 #include "InGame/Contents/Human.h"
 #include "Components/CapsuleComponent.h"
+#include "GameFramework/GameStateBase.h"
 
 // Sets default values
 AHuman::AHuman()
@@ -50,6 +51,13 @@ float AHuman::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 		return 0.0f;
 	}
 
+	if (CurrentState == ECurrentState::Guard)
+	{
+		CheckGuard();
+
+		return 0.0f;
+	}
+
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance && AnimInstance->IsAnyMontagePlaying())
 	{
@@ -74,12 +82,25 @@ float AHuman::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 
 bool AHuman::CheckIsDamaged()
 {
-	if (CurrentState == ECurrentState::Interact || CurrentState == ECurrentState::Guard ||
-		CurrentState == ECurrentState::Rolling || CurrentState == ECurrentState::On_Damaged)
+	if (CurrentState == ECurrentState::Interact || CurrentState == ECurrentState::Rolling ||
+		CurrentState == ECurrentState::On_Damaged)
 	{
 		return false;
 	}
 
-	// true -> 피격당하는 상태
 	return true;
+}
+
+void AHuman::CheckGuard()
+{
+	float CurrentTime = GetWorld()->GetGameState()->GetServerWorldTimeSeconds();
+
+	if ((CurrentTime - GuardStartTime) <= 0.15f)
+	{
+		PlayAnimMontage(Guard_Hit_Montage);
+		return;
+	}
+
+	PlayAnimMontage(Guard_Perfect_Hit_Montage);
+	return;
 }

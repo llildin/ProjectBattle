@@ -3,6 +3,7 @@
 
 #include "InGame/Contents/AttackPracticeNPC.h"
 #include "InGame/AttackFunction.h"
+#include "GameFramework/GameStateBase.h"
 
 void AAttackPracticeNPC::BeginPlay()
 {
@@ -25,6 +26,11 @@ void AAttackPracticeNPC::SetCurrentState(ECurrentState NewState)
 	
 	CurrentState = NewState;
 	OnStateChanged.ExecuteIfBound(NewState);
+
+	if (NewState == ECurrentState::Guard)
+	{
+		GuardStartTime = GetWorld()->GetGameState()->GetServerWorldTimeSeconds();
+	}
 
 	if (NewState == ECurrentState::BasicAttack)
 	{

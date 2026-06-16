@@ -22,6 +22,14 @@ enum class ECurrentState : uint8
 	Interact = 60 UMETA(DisplayName = "Interact")
 };
 
+UENUM(BlueprintType)
+enum class EGuardHit : uint8
+{
+	Hit = 0 UMETA(DisplayName = "Hit"),
+	Guard_Hit = 0 UMETA(DisplayName = "Guard_Hit"),
+	Guard_Perfect_Hit = 0 UMETA(DisplayName = "Guard_Perfect_Hit")
+};
+
 UCLASS()
 class PROJECTBATTLE_API AHuman : public ACharacter
 {
@@ -66,4 +74,16 @@ public:
 		class AController* EventInstigator, AActor* DamageCauser) override;
 
 	bool CheckIsDamaged();
+
+
+	// Guard
+	float GuardStartTime;
+
+	void CheckGuard();
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
+	TObjectPtr<UAnimMontage> Guard_Hit_Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
+	TObjectPtr<UAnimMontage> Guard_Perfect_Hit_Montage;
 };
