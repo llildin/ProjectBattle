@@ -45,7 +45,7 @@ float AHuman::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 {
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	if (CurrentState == ECurrentState::On_Damaged)
+	if (!CheckIsDamaged())
 	{
 		return 0.0f;
 	}
@@ -64,12 +64,22 @@ float AHuman::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 
 	HP = FMath::Clamp(HP - ActualDamage, 0.0f, MaxHP);
 
-	UE_LOG(LogTemp, Warning, TEXT("%d"), HP);
-
 	if (HP <= 0.0f)
 	{
 		// Die();
 	}
 
 	return ActualDamage;
+}
+
+bool AHuman::CheckIsDamaged()
+{
+	if (CurrentState == ECurrentState::Interact || CurrentState == ECurrentState::Guard ||
+		CurrentState == ECurrentState::Rolling || CurrentState == ECurrentState::On_Damaged)
+	{
+		return false;
+	}
+
+	// true -> 피격당하는 상태
+	return true;
 }

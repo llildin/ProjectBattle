@@ -61,7 +61,9 @@ public:
 
 	virtual void RefreshAttackSetting();
 
-	//On_Damaged
+	// On_Damaged
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
 		class AController* EventInstigator, AActor* DamageCauser) override;
+
+	bool CheckIsDamaged();
 };
