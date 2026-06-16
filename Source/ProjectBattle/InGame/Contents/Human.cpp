@@ -33,3 +33,7 @@ void AHuman::Tick(float DeltaTime)
 
 }
 
+void AHuman::SetCurrentState(ECurrentState NewState)
+{
+
+}

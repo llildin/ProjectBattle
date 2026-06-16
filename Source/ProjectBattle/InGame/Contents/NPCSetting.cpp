@@ -40,5 +40,5 @@ void UNPCSetting::OnClickedCloseButton()
 	FString StateName = FString::Printf(TEXT("ECurrentState::%s"), *SelectedState);
 	int64 EnumValue = EnumPtr->GetValueByName(FName(*StateName));
 
-	NPC->SetState(static_cast<ECurrentState>(EnumValue));
+	NPC->SetCurrentState(static_cast<ECurrentState>(EnumValue));
 }

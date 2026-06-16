@@ -39,9 +39,20 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	ECurrentState CurrentState;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	ECurrentState PrevState;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UStaticMeshComponent> Katana;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stat")
-	uint8 Hp = 100;
+	uint8 HP = 100;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stat")
+	uint8 MaxHP = 100;
+
+	virtual void SetCurrentState(ECurrentState NewState);
 };

@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #include "InGame/Contents/InGamePlayer.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -29,6 +29,9 @@ AInGamePlayer::AInGamePlayer()
 	
 
 	GetCharacterMovement()->MaxWalkSpeed = 300.0f;
+
+	CurrentState = ECurrentState::No_Battle;
+	PrevState = ECurrentState::No_Battle;
 }
 
 // Called when the game starts or when spawned
@@ -197,6 +200,8 @@ void AInGamePlayer::Interact(const FInputActionValue& Value)
 
 void AInGamePlayer::SetCurrentState(ECurrentState NewState)
 {
+	Super::SetCurrentState(NewState);
+
 	CurrentState = NewState;
 	OnStateChanged.ExecuteIfBound(NewState);
 	UpdateMoveSpeed();
@@ -388,4 +393,30 @@ FName AInGamePlayer::GetRollingSectionName(float Direction)
 void AInGamePlayer::BasicAttackTrace()
 {
 	UAttackFunction::BasicAttackTraceShot(DT_AttackData, AttackSectionName, this);
+}
+
+float AInGamePlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	if (CurrentState == ECurrentState::On_Damaged)
+	{
+		return 0.0f;
+	}
+
+	PrevState = CurrentState;
+	SetCurrentState(ECurrentState::On_Damaged);
+
+	if (ActualDamage <= 0.0f) return 0.0f;
+
+	HP = FMath::Clamp(HP - ActualDamage, 0.0f, MaxHP);
+
+	UE_LOG(LogTemp, Warning, TEXT("%d"), HP);
+
+	if (HP <= 0.0f)
+	{
+		// Die();
+	}
+
+	return ActualDamage;
 }

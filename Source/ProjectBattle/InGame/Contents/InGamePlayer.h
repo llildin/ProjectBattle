@@ -105,17 +105,13 @@ public:
 
 
 	//Player ป๓ลย
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
-	ECurrentState CurrentState = ECurrentState::No_Battle;
-
-	ECurrentState PrevState = ECurrentState::No_Battle;
 
 	EMoveState CurrentMoveState = EMoveState::Idle;
 
 	DECLARE_DELEGATE_OneParam(FOnStateChanged, ECurrentState)
 	FOnStateChanged OnStateChanged;
 
-	void SetCurrentState(ECurrentState NewState);
+	virtual void SetCurrentState(ECurrentState NewState) override;
 
 	void UpdateMoveSpeed();
 
@@ -180,5 +176,9 @@ public:
 
 	//NPC Setting
 	bool bIsNPCSetting = false;
+
+	//On_Damaged
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
+		class AController* EventInstigator, AActor* DamageCauser) override;
 
 };

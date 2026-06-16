@@ -9,19 +9,24 @@ void AAttackPracticeNPC::BeginPlay()
 	Super::BeginPlay();
 	
 	SetAnimRootMotionTranslationScale(0.0f);
+
+	CurrentState = ECurrentState::Attack;
+	PrevState = ECurrentState::No_Battle;
 }
 
-void AAttackPracticeNPC::SetState(ECurrentState State)
+void AAttackPracticeNPC::SetCurrentState(ECurrentState NewState)
 {
-	if (CurrentState == State)
+	Super::SetCurrentState(NewState);
+
+	if (CurrentState == NewState)
 	{
 		return;
 	}
+	
+	CurrentState = NewState;
+	OnStateChanged.ExecuteIfBound(NewState);
 
-	CurrentState = State;
-	OnStateChanged.ExecuteIfBound(State);
-
-	if (State == ECurrentState::BasicAttack)
+	if (NewState == ECurrentState::BasicAttack)
 	{
 		bIsNPCAttacking = true;
 		StartNPCBasicComboAttack();

@@ -1,9 +1,10 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "InGame/AttackFunction.h"
 #include "InGame/Contents/Sturcture_AttackData.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/GameplayStatics.h"
 
 void UAttackFunction::BasicAttackTraceShot(UDataTable* DT_AttackData, FString AttackSectionName, AActor* Actor)
 {
@@ -38,6 +39,28 @@ void UAttackFunction::BasicAttackTraceShot(UDataTable* DT_AttackData, FString At
 		true
 	);
 
+	if (bTraceHit)
+	{
+		TArray<AActor*> AlreadyHitActors;
+
+		for (const FHitResult& Hit : OutHits)
+		{
+			AActor* HitActor = Hit.GetActor();
+
+			if (HitActor && !AlreadyHitActors.Contains(HitActor))
+			{
+				AlreadyHitActors.Add(HitActor);
+
+				UGameplayStatics::ApplyDamage(
+					HitActor,                      // 데미지 받을 대상 (AActor*)
+					AttackData->Damage,            // 데미지 수치
+					Actor->GetInstigatorController(), // 공격을 지시한 컨트롤러
+					Actor,                      // 공격자 본인 (Damage Causer)
+					UDamageType::StaticClass()     // 데미지 타입 (기본)
+				);
+			}
+		}
+	}
 }
 
 FVector UAttackFunction::GetTraceLocation(FVector Offset, AActor* Actor)

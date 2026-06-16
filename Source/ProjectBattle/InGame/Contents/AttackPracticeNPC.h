@@ -24,10 +24,8 @@ protected:
 public:
 
 	//NPC Setting
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
-	ECurrentState CurrentState = ECurrentState::Battle;
 
-	void SetState(ECurrentState State);
+	virtual void SetCurrentState(ECurrentState NewState) override;
 
 	DECLARE_DELEGATE_OneParam(FOnStateChanged, ECurrentState)
 	FOnStateChanged OnStateChanged;
