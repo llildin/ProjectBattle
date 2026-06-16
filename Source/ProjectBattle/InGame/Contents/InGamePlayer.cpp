@@ -269,13 +269,13 @@ void AInGamePlayer::BasicComboAttack()
 	if (CurrentState == ECurrentState::No_Battle || CurrentState == ECurrentState::Battle 
 		|| CurrentState == ECurrentState::Attack || CurrentState == ECurrentState::Guard)
 	{
-		if (!bIsBasicAttacking)
+		if (!bIsAttacking)
 		{
 			BasicComboAttackCount++;
 
 			PlayBasicComboAttackMontage();
 
-			bIsBasicAttacking = true;
+			bIsAttacking = true;
 
 			if (CurrentState == ECurrentState::No_Battle)
 			{
@@ -292,7 +292,7 @@ void AInGamePlayer::BasicComboAttack()
 
 			PlayingBasicComboAttackIndex = BasicComboAttackCount;
 		}
-		else if (bIsBasicAttacking && PlayingBasicComboAttackIndex == BasicComboAttackCount)
+		else if (bIsAttacking && PlayingBasicComboAttackIndex == BasicComboAttackCount)
 		{
 			BasicComboAttackCount++;
 		}
@@ -316,7 +316,7 @@ void AInGamePlayer::PlayBasicComboAttackMontage()
 				{
 					WeakThis->BasicComboAttackCount = 0;
 					WeakThis->PlayingBasicComboAttackIndex = 0;
-					WeakThis->bIsBasicAttacking = false;
+					WeakThis->bIsAttacking = false;
 					WeakThis->bUseControllerRotationYaw = false;
 					WeakThis->SetCurrentState(ECurrentState::Battle);
 				}
@@ -324,6 +324,15 @@ void AInGamePlayer::PlayBasicComboAttackMontage()
 			AnimInstance->Montage_SetEndDelegate(EndDelegate);
 		}
 	}
+}
+
+void AInGamePlayer::RefreshAttackSetting()
+{
+	Super::RefreshAttackSetting();
+
+	BasicComboAttackCount = 0;
+	PlayingBasicComboAttackIndex = 0;
+	bIsAttacking = false;
 }
 
 void AInGamePlayer::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupted)
@@ -340,14 +349,14 @@ void AInGamePlayer::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupte
 
 void AInGamePlayer::Rolling()
 {
-	if (bIsBasicAttacking)
+	if (bIsAttacking)
 	{
 		StopAnimMontage(BasicComboAttackMontage);
 		BasicComboAttackCount = 0;
 		PlayingBasicComboAttackIndex = 0;
-		bIsBasicAttacking = false;
+		bIsAttacking = false;
 	}
-
+	
 	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
 	{		
 		float Direction = UKismetAnimationLibrary::CalculateDirection(LastInputVector, GetActorRotation());
@@ -395,28 +404,3 @@ void AInGamePlayer::BasicAttackTrace()
 	UAttackFunction::BasicAttackTraceShot(DT_AttackData, AttackSectionName, this);
 }
 
-float AInGamePlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
-{
-	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-
-	if (CurrentState == ECurrentState::On_Damaged)
-	{
-		return 0.0f;
-	}
-
-	PrevState = CurrentState;
-	SetCurrentState(ECurrentState::On_Damaged);
-
-	if (ActualDamage <= 0.0f) return 0.0f;
-
-	HP = FMath::Clamp(HP - ActualDamage, 0.0f, MaxHP);
-
-	UE_LOG(LogTemp, Warning, TEXT("%d"), HP);
-
-	if (HP <= 0.0f)
-	{
-		// Die();
-	}
-
-	return ActualDamage;
-}

@@ -135,12 +135,11 @@ public:
 	TObjectPtr<UAnimMontage> BasicComboAttackMontage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
-	uint8 bIsBasicAttacking : 1 = false;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
 	uint8 PlayingBasicComboAttackIndex = 0;
 
 	FString AttackSectionName;
+
+	virtual void RefreshAttackSetting() override;
 
 
 	//Test
@@ -177,8 +176,5 @@ public:
 	//NPC Setting
 	bool bIsNPCSetting = false;
 
-	//On_Damaged
-	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
-		class AController* EventInstigator, AActor* DamageCauser) override;
 
 };

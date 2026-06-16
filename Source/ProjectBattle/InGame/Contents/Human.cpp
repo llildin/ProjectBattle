@@ -35,5 +35,41 @@ void AHuman::Tick(float DeltaTime)
 
 void AHuman::SetCurrentState(ECurrentState NewState)
 {
+}
 
+void AHuman::RefreshAttackSetting()
+{
+}
+
+float AHuman::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	if (CurrentState == ECurrentState::On_Damaged)
+	{
+		return 0.0f;
+	}
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && AnimInstance->IsAnyMontagePlaying())
+	{
+		RefreshAttackSetting();
+		AnimInstance->Montage_Stop(0.1f);
+	}
+
+	PrevState = CurrentState;
+	SetCurrentState(ECurrentState::On_Damaged);
+
+	if (ActualDamage <= 0.0f) return 0.0f;
+
+	HP = FMath::Clamp(HP - ActualDamage, 0.0f, MaxHP);
+
+	UE_LOG(LogTemp, Warning, TEXT("%d"), HP);
+
+	if (HP <= 0.0f)
+	{
+		// Die();
+	}
+
+	return ActualDamage;
 }

@@ -27,6 +27,8 @@ public:
 
 	virtual void SetCurrentState(ECurrentState NewState) override;
 
+	virtual void RefreshAttackSetting() override;
+
 	DECLARE_DELEGATE_OneParam(FOnStateChanged, ECurrentState)
 	FOnStateChanged OnStateChanged;
 
@@ -35,7 +37,6 @@ public:
 	TObjectPtr<UAnimMontage> AttackMontage;
 
 	int32 NPCComboCount = 0;
-	bool bIsNPCAttacking = false;
 	FString AttackSectionName;
 
 	void StartNPCBasicComboAttack();

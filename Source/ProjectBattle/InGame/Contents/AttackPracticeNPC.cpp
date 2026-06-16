@@ -28,14 +28,19 @@ void AAttackPracticeNPC::SetCurrentState(ECurrentState NewState)
 
 	if (NewState == ECurrentState::BasicAttack)
 	{
-		bIsNPCAttacking = true;
+		bIsAttacking = true;
 		StartNPCBasicComboAttack();
 	}
 	else
 	{
-		bIsNPCAttacking = false;
+		bIsAttacking = false;
 		NPCComboCount = 0;
 	}
+}
+
+void AAttackPracticeNPC::RefreshAttackSetting()
+{
+	Super::RefreshAttackSetting();
 }
 
 void AAttackPracticeNPC::StartNPCBasicComboAttack()
@@ -56,7 +61,7 @@ void AAttackPracticeNPC::NPCCheckBasicComboAttack()
 
 void AAttackPracticeNPC::PlayNPCBasicComboAttackMontage()
 {
-	if (bIsNPCAttacking)
+	if (bIsAttacking)
 	{
 		if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
 		{

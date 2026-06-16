@@ -15,6 +15,11 @@ void UAttackFunction::BasicAttackTraceShot(UDataTable* DT_AttackData, FString At
 	
 	FAttackData* AttackData = DT_AttackData->FindRow<FAttackData>(FName(AttackSectionName), TEXT(""));
 
+	if (AttackData == nullptr)
+	{
+		return;
+	}
+
 	FVector StartLocation = GetTraceLocation(AttackData->StartOffset, Actor);
 	FVector EndLocation = GetTraceLocation(AttackData->EndOffset, Actor);
 

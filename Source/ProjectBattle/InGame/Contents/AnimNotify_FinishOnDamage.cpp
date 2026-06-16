@@ -15,10 +15,13 @@ void UAnimNotify_FinishOnDamage::Notify(USkeletalMeshComponent* MeshComp, UAnimS
 		{
 			Human->SetCurrentState(Human->PrevState);
 		}
+		else if (Human->PrevState == ECurrentState::BasicAttack)
+		{
+			Human->SetCurrentState(Human->PrevState);
+		}
 		else
 		{
 			Human->SetCurrentState(ECurrentState::Battle);
 		}
-		UE_LOG(LogTemp, Warning, TEXT("ddddd"));
 	}
 }

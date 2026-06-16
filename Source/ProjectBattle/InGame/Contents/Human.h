@@ -54,5 +54,14 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stat")
 	uint8 MaxHP = 100;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
+	uint8 bIsAttacking : 1 = false;
+
 	virtual void SetCurrentState(ECurrentState NewState);
+
+	virtual void RefreshAttackSetting();
+
+	//On_Damaged
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
+		class AController* EventInstigator, AActor* DamageCauser) override;
 };
