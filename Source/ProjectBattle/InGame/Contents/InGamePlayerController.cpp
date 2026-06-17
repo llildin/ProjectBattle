@@ -85,3 +85,8 @@ void AInGamePlayerController::NPCSettingInteract()
     bShowMouseCursor = true;
     SetInputMode(FInputModeUIOnly());
 }
+
+void AInGamePlayerController::CallRefreshPlayerHp(float NewHp, float MaxHp)
+{
+    InGameBaseUIObject->RefreshPlayerHp(NewHp, MaxHp);
+}

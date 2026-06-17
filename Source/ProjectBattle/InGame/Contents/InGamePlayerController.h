@@ -49,4 +49,8 @@ public:
 	void NPCSettingInteract();
 
 	AInGamePlayer* Player;
+
+
+	//Update InGameBaseUI
+	void CallRefreshPlayerHp(float NewHp, float MaxHp);
 };

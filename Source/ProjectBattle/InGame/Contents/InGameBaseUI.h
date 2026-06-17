@@ -4,7 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+
 #include "InGameBaseUI.generated.h"
+
+class UProgressBar;
 
 /**
  * 
@@ -14,4 +17,14 @@ class PROJECTBATTLE_API UInGameBaseUI : public UUserWidget
 {
 	GENERATED_BODY()
 	
+public:
+
+	virtual void NativeConstruct() override;
+
+	void RefreshPlayerHp(float NewHp, float MaxHp);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (BindWidget))
+	TObjectPtr<UProgressBar> HpBar;
+
+
 };

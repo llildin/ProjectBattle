@@ -57,10 +57,10 @@ public:
 	TObjectPtr<UStaticMeshComponent> Katana;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stat")
-	uint8 HP = 100;
+	float HP = 100;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stat")
-	uint8 MaxHP = 100;
+	float MaxHP = 100;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
 	uint8 bIsAttacking : 1 = false;

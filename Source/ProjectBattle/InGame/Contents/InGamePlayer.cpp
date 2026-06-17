@@ -406,3 +406,12 @@ void AInGamePlayer::BasicAttackTrace()
 	UAttackFunction::BasicAttackTraceShot(DT_AttackData, AttackSectionName, this);
 }
 
+float AInGamePlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	Controller->CallRefreshPlayerHp(HP, MaxHP);
+
+	return 0.0f;
+}
+
