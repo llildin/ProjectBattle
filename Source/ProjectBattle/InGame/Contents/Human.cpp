@@ -36,6 +36,10 @@ void AHuman::Tick(float DeltaTime)
 
 void AHuman::SetCurrentState(ECurrentState NewState)
 {
+	if (CurrentState == NewState)
+	{
+		return;
+	}
 }
 
 void AHuman::RefreshAttackSetting()
@@ -93,14 +97,32 @@ bool AHuman::CheckIsDamaged()
 
 void AHuman::CheckGuard()
 {
-	float CurrentTime = GetWorld()->GetGameState()->GetServerWorldTimeSeconds();
-
-	if ((CurrentTime - GuardStartTime) <= 0.15f)
+	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
 	{
-		PlayAnimMontage(Guard_Hit_Montage);
-		return;
-	}
+		float CurrentTime = GetWorld()->GetGameState()->GetServerWorldTimeSeconds();
+		float MontageLength = 0.0f;
 
-	PlayAnimMontage(Guard_Perfect_Hit_Montage);
-	return;
+		if ((CurrentTime - GuardStartTime) <= 0.15f)
+		{
+			MontageLength = PlayAnimMontage(Guard_Perfect_Hit_Montage);
+		}
+		else
+		{
+			MontageLength = PlayAnimMontage(Guard_Hit_Montage);
+		}
+
+		if (MontageLength > 0)
+		{
+
+			FOnMontageEnded EndDelegate;
+
+			EndDelegate.BindLambda([WeakThis = TWeakObjectPtr<AHuman>(this)](UAnimMontage* Montage, bool bInterrupted) {
+				if (!bInterrupted && WeakThis.IsValid())
+				{
+					WeakThis->SetCurrentState(ECurrentState::Guard);
+				}
+				});
+			AnimInstance->Montage_SetEndDelegate(EndDelegate);
+		}
+	}
 }

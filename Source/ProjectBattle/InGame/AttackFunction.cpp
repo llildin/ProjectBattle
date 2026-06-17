@@ -39,7 +39,7 @@ void UAttackFunction::BasicAttackTraceShot(UDataTable* DT_AttackData, FString At
 		ObjectTypes,
 		false,
 		ActorsToIgnore,
-		EDrawDebugTrace::ForDuration,
+		EDrawDebugTrace::None,
 		OutHits,
 		true
 	);
