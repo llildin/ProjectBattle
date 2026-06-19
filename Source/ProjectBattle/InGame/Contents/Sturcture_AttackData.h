@@ -15,4 +15,7 @@ struct FAttackData : public FTableRowBase
 
     UPROPERTY(EditAnywhere)
     float Damage;
+
+    UPROPERTY(EditAnywhere)
+    float PostureDamage;
 };

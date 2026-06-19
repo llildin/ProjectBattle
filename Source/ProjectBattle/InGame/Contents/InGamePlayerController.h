@@ -52,5 +52,5 @@ public:
 
 
 	//Update InGameBaseUI
-	void CallRefreshPlayerStat(float NewHp, float MaxHp);
+	void CallRefreshPlayerStat(float NewHp, float MaxHp, float NewPosture, float MaxPosture);
 };

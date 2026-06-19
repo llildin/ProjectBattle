@@ -410,8 +410,13 @@ float AInGamePlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEv
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	Controller->CallRefreshPlayerStat(HP, MaxHP);
+	UpDateUI();
 
 	return 0.0f;
+}
+
+void AInGamePlayer::UpDateUI()
+{
+	Controller->CallRefreshPlayerStat(HP, MaxHP, Posture, MaxPosture);
 }
 

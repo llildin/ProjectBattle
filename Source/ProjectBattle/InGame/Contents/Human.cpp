@@ -4,6 +4,7 @@
 #include "InGame/Contents/Human.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/GameStateBase.h"
+#include "InGamePlayer.h"
 
 // Sets default values
 AHuman::AHuman()
@@ -57,7 +58,7 @@ float AHuman::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 
 	if (CurrentState == ECurrentState::Guard)
 	{
-		CheckGuard();
+		CheckGuard(ActualDamage, DamageCauser);
 
 		return 0.0f;
 	}
@@ -76,10 +77,7 @@ float AHuman::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 
 	HP = FMath::Clamp(HP - ActualDamage, 0.0f, MaxHP);
 
-	if (HP <= 0.0f)
-	{
-		// Die();
-	}
+	Posture = FMath::Clamp(Posture + (ActualDamage * NormalPostureDamageRate), 0.0f, MaxPosture);
 
 	return ActualDamage;
 }
@@ -95,7 +93,7 @@ bool AHuman::CheckIsDamaged()
 	return true;
 }
 
-void AHuman::CheckGuard()
+void AHuman::CheckGuard(float Damage, AActor* Attacker)
 {
 	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
 	{
@@ -105,10 +103,20 @@ void AHuman::CheckGuard()
 		if ((CurrentTime - GuardStartTime) <= 0.15f)
 		{
 			MontageLength = PlayAnimMontage(Guard_Perfect_Hit_Montage);
+			Posture = FMath::Clamp(Posture + (Damage * PerfectGuardPostureDamageRate), 0.0f, MaxPosture);
+
+			AHuman* AttackPlayer = Cast<AHuman>(Attacker);
+			AttackPlayer->Posture = FMath::Clamp(AttackPlayer->Posture + (Damage * GuardPostureDamageRate), 0.0f, AttackPlayer->MaxPosture);
+
+			if (AInGamePlayer* InGamePlayer = Cast<AInGamePlayer>(AttackPlayer))
+			{
+				InGamePlayer->UpDateUI();
+			}
 		}
 		else
 		{
 			MontageLength = PlayAnimMontage(Guard_Hit_Montage);
+			Posture = FMath::Clamp(Posture + (Damage * GuardPostureDamageRate), 0.0f, MaxPosture);
 		}
 
 		if (MontageLength > 0)

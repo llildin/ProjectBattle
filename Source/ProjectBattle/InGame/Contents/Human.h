@@ -68,6 +68,15 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stat")
 	float MaxPosture = 100;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PostureDamage")
+	float NormalPostureDamageRate = 0.7f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PostureDamage")
+	float GuardPostureDamageRate = 0.3f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PostureDamage")
+	float PerfectGuardPostureDamageRate = 0.0f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
 	uint8 bIsAttacking : 1 = false;
 
@@ -85,7 +94,7 @@ public:
 	// Guard
 	float GuardStartTime;
 
-	void CheckGuard();
+	void CheckGuard(float Damage, AActor* Attacker);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
 	TObjectPtr<UAnimMontage> Guard_Hit_Montage;
@@ -93,3 +102,27 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
 	TObjectPtr<UAnimMontage> Guard_Perfect_Hit_Montage;
 };
+
+/*
+스탯 : 체력(Hp), 체간(Posture), 체간회복량(PostureHeal), 체간데미지(PostureDamage)
+
+체간 최소 0
+체간 최대 100
+
+가드를 안하고 피격시 피격데미지의 70% 만큼 체간피해
+가드를 하고 피격시 피격데미지의 30%만큼 체간피해
+퍼펙트 가드시 피격데미지의 0%만큼 체간피해
+퍼펙트 가드시 공격자에게 피격데미지의 30%만큼 체간피해
+
+가드를 하지 않은 상태 기준에서는
+체간회복량은 초당 3 회복(PostureHeal 수치 만큼)
+체간은 현재 체력이 100%~75%일 때 100% 속도로 자연 회복
+      체력이 75%~50%일 때 66% 속도로 자연 회복
+	  체력이 50%~25%일 때 33% 속도로 자연 회복
+      체력이 25%~0%일 때 1% 속도로 자연 회복
+
+가드를 하고 있다면
+가드를 하지 않은 상태의 회복량보다 150%의 수치로 회복
+
+피격시 3초간 체간은 회복되지 않음
+*/
