@@ -9,6 +9,17 @@
 
 class UProgressBar;
 
+USTRUCT(BlueprintType)
+struct FStatData
+{
+	GENERATED_BODY()
+
+	float CurrentHp = 0.0f;
+	float MaxHp = 100.0f;
+	float CurrentPosture = 0.0f;
+	float MaxPosture = 100.0f;
+};
+
 /**
  * 
  */
@@ -31,19 +42,13 @@ public:
 
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
-	float PlayerHp = 0.0f;
-	float PlayerMaxHp = 0.0f;
-	float PlayerPosture = 0.0f;
-	float PlayerMaxPosture = 0.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stat")
+	FStatData PlayerData;
 
-	float PlayerHpRate;
-	float PlayerPostureHeal;
-
-	float EnemyHp = 0.0f;
-	float EnemyMaxHp = 0.0f;
-	float EnemyPosture = 0.0f;
-	float EnemyMaxPosture = 0.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stat")
+	FStatData EnemyData;
 
 	float PostureHeal = 3.0f;
-
+	float PlayerPostureHeal;
+	float PlayerHpRate;
 };
