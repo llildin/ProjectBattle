@@ -11,7 +11,7 @@ void UInGameBaseUI::NativeConstruct()
 	HpBar->SetPercent(1);
 }
 
-void UInGameBaseUI::RefreshPlayerHp(float NewHp, float MaxHp)
+void UInGameBaseUI::RefreshPlayerStat(float NewHp, float MaxHp)
 {
 	HpBar->SetPercent(NewHp / MaxHp);
 }

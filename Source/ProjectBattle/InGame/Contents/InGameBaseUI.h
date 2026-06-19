@@ -21,7 +21,7 @@ public:
 
 	virtual void NativeConstruct() override;
 
-	void RefreshPlayerHp(float NewHp, float MaxHp);
+	void RefreshPlayerStat(float NewHp, float MaxHp);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (BindWidget))
 	TObjectPtr<UProgressBar> HpBar;

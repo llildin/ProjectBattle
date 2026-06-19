@@ -86,7 +86,7 @@ void AInGamePlayerController::NPCSettingInteract()
     SetInputMode(FInputModeUIOnly());
 }
 
-void AInGamePlayerController::CallRefreshPlayerHp(float NewHp, float MaxHp)
+void AInGamePlayerController::CallRefreshPlayerStat(float NewHp, float MaxHp)
 {
-    InGameBaseUIObject->RefreshPlayerHp(NewHp, MaxHp);
+    InGameBaseUIObject->RefreshPlayerStat(NewHp, MaxHp);
 }

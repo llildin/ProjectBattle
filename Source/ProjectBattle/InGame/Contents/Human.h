@@ -62,6 +62,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stat")
 	float MaxHP = 100;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stat")
+	float Posture = 0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stat")
+	float MaxPosture = 100;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
 	uint8 bIsAttacking : 1 = false;
 
