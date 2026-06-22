@@ -33,6 +33,34 @@ void AHuman::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (HitTime > 0.0f)
+	{
+		HitTime -= DeltaTime;
+		return;
+	}
+
+	if (HP != 0.0f && Posture != 0.0f)
+	{
+		PostureHeal = POSTUREHEAL * DeltaTime;
+		HpRate = HP / MaxHP;
+
+		if (HpRate >= 0.75f)
+		{
+			Posture = FMath::Clamp(Posture - PostureHeal, 0.0f, MaxPosture);
+		}
+		else if (HpRate >= 0.5 && HpRate < 0.75)
+		{
+			Posture = FMath::Clamp(Posture - (PostureHeal * 0.66f), 0.0f, MaxPosture);
+		}
+		else if (HpRate >= 0.25 && HpRate < 0.5)
+		{
+			Posture = FMath::Clamp(Posture - (PostureHeal * 0.33f), 0.0f, MaxPosture);
+		}
+		else
+		{
+			Posture = FMath::Clamp(Posture - (PostureHeal * 0.01f), 0.0f, MaxPosture);
+		}
+	}
 }
 
 void AHuman::SetCurrentState(ECurrentState NewState)
@@ -55,6 +83,8 @@ float AHuman::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	{
 		return 0.0f;
 	}
+
+	HitTime = HIT_TIME;
 
 	if (CurrentState == ECurrentState::Guard)
 	{
@@ -107,6 +137,7 @@ void AHuman::CheckGuard(float Damage, AActor* Attacker)
 
 			AHuman* AttackPlayer = Cast<AHuman>(Attacker);
 			AttackPlayer->Posture = FMath::Clamp(AttackPlayer->Posture + (Damage * GuardPostureDamageRate), 0.0f, AttackPlayer->MaxPosture);
+			AttackPlayer->HitTime = HIT_TIME;
 
 			if (AInGamePlayer* InGamePlayer = Cast<AInGamePlayer>(AttackPlayer))
 			{
@@ -125,7 +156,7 @@ void AHuman::CheckGuard(float Damage, AActor* Attacker)
 			FOnMontageEnded EndDelegate;
 
 			EndDelegate.BindLambda([WeakThis = TWeakObjectPtr<AHuman>(this)](UAnimMontage* Montage, bool bInterrupted) {
-				if (!bInterrupted && WeakThis.IsValid())
+				if (!bInterrupted && WeakThis.IsValid() && WeakThis->CurrentState != ECurrentState::Battle)
 				{
 					WeakThis->SetCurrentState(ECurrentState::Guard);
 				}

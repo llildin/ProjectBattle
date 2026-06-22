@@ -21,13 +21,21 @@ void UInGameBaseUI::RefreshPlayerStat(float NewHp, float MaxHp, float NewPosture
 	PlayerData.MaxHp = MaxHp;
 	PlayerData.CurrentPosture = NewPosture;
 	PlayerData.MaxPosture = MaxPosture;
+
+	HitTime = 3.0f;
 }
 
 void UInGameBaseUI::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
-	if (PlayerData.CurrentHp != 0.0f)
+	if (HitTime > 0.0f)
+	{
+		HitTime -= InDeltaTime;
+		return;
+	}
+
+	if (PlayerData.CurrentHp != 0.0f && PlayerData.CurrentPosture != 0.0f)
 	{
 		PlayerPostureHeal = PostureHeal * InDeltaTime;
 		PlayerHpRate = PlayerData.CurrentHp / PlayerData.MaxHp;

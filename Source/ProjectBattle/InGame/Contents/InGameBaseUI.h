@@ -51,4 +51,5 @@ public:
 	float PostureHeal = 3.0f;
 	float PlayerPostureHeal;
 	float PlayerHpRate;
+	float HitTime = 3.0f;
 };

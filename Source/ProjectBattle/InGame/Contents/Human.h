@@ -9,6 +9,9 @@
 
 class UStaticMeshComponent;
 
+#define HIT_TIME		3.0f
+#define POSTUREHEAL		3.0f
+
 UENUM(BlueprintType)
 enum class ECurrentState : uint8
 {
@@ -68,6 +71,14 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stat")
 	float MaxPosture = 100;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stat")
+	float HitTime = 3.0f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stat")
+	float PostureHeal = 3.0f;
+
+	float HpRate;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "PostureDamage")
 	float NormalPostureDamageRate = 0.7f;
 
@@ -120,9 +131,6 @@ public:
       체력이 75%~50%일 때 66% 속도로 자연 회복
 	  체력이 50%~25%일 때 33% 속도로 자연 회복
       체력이 25%~0%일 때 1% 속도로 자연 회복
-
-가드를 하고 있다면
-가드를 하지 않은 상태의 회복량보다 150%의 수치로 회복
 
 피격시 3초간 체간은 회복되지 않음
 */
