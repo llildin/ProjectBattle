@@ -27,5 +27,11 @@ void ATitlePlayerController::BeginPlay()
 				TitleMainUIObject->SetVisibility(ESlateVisibility::Collapsed);
 				LobbyMainUIObject->SetVisibility(ESlateVisibility::Visible);
 			});
+
+		LobbyMainUIObject->OnQuitLobby.BindLambda([this]()
+			{
+				TitleMainUIObject->SetVisibility(ESlateVisibility::Visible);
+				LobbyMainUIObject->SetVisibility(ESlateVisibility::Collapsed);
+			});
 	}
 }
