@@ -6,6 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "TitleMainUI.generated.h"
 
+class UButton;
+
 /**
  * 
  */
@@ -14,4 +16,16 @@ class PROJECTBATTLE_API UTitleMainUI : public UUserWidget
 {
 	GENERATED_BODY()
 	
+public:
+
+	virtual void NativeConstruct() override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (BindWidget))
+	TObjectPtr<UButton> Btn_Start;
+
+	UFUNCTION()
+	void OnClickedStartButton();
+
+	DECLARE_DELEGATE(FOnStartGame)
+	FOnStartGame OnStartGame;
 };
