@@ -3,3 +3,13 @@
 
 #include "Title/LobbyListUI.h"
 
+void ULobbyListUI::SetInfo(FBlueprintSessionResult InSessionResult)
+{
+	Result = InSessionResult;
+
+	RefreshUI();
+}
+
+void ULobbyListUI::RefreshUI()
+{
+}

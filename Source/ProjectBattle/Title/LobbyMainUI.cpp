@@ -10,8 +10,6 @@ void ULobbyMainUI::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	SetSessionInfos();
-
 	if (Btn_Create)
 	{
 		Btn_Create->OnClicked.RemoveDynamic(this, &ULobbyMainUI::OnClickedCreateButton);
@@ -31,6 +29,8 @@ void ULobbyMainUI::NativeConstruct()
 	}
 
 	SetInfo();
+
+	SetSessionInfos();
 }
 
 void ULobbyMainUI::SetInfo()
@@ -71,7 +71,7 @@ void ULobbyMainUI::RefreshUI()
 		{
 			LobbyListUIObject[index]->SetVisibility(ESlateVisibility::Visible);
 			FBlueprintSessionResult Result = SessionInfos[index];
-			//LobbyListUIObject[index]->SetInfo(Result);
+			LobbyListUIObject[index]->SetInfo(Result);
 		}
 		else
 		{
