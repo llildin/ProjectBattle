@@ -7,6 +7,8 @@
 #include "Blueprint/UserWidget.h"
 #include "LobbyListUI.generated.h"
 
+class UTextBlock;
+
 /**
  * 
  */
@@ -27,4 +29,9 @@ public:
 	FBlueprintSessionResult Result;
 
 
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	TObjectPtr<UTextBlock> Txt_RoomName;
+
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+	TObjectPtr<UTextBlock> Txt_PlayerCount;
 };

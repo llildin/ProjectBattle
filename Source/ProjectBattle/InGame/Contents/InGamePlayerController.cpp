@@ -8,9 +8,9 @@
 #include "InGameBaseUI.h"
 #include "InGamePlayer.h"
 
-void AInGamePlayerController::OnPossess(APawn* aPawn)
+void AInGamePlayerController::AcknowledgePossession(APawn* aPawn)
 {
-    Super::OnPossess(aPawn);
+    Super::AcknowledgePossession(aPawn);
 
     
     if (IsLocalPlayerController())

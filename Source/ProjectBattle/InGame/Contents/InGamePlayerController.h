@@ -26,7 +26,7 @@ public:
 	TArray<TSoftObjectPtr<UInputMappingContext>> IMC_InGame;
 
 protected:
-	virtual void OnPossess(APawn* aPawn) override;
+	virtual void AcknowledgePossession(APawn* aPawn) override;
 
 	virtual void OnUnPossess() override;
 
