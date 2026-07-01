@@ -80,7 +80,7 @@ void AInGamePlayerController::NPCSettingInteract()
     InGameBaseUIObject->SetVisibility(ESlateVisibility::Collapsed);
     NPCSettingObject->SetVisibility(ESlateVisibility::Visible);
 
-    Player->SetCurrentState(ECurrentState::Interact);
+    Player->C2S_SetCurrentState(ECurrentState::Interact);
 
     bShowMouseCursor = true;
     SetInputMode(FInputModeUIOnly());

@@ -33,6 +33,8 @@ AInGamePlayer::AInGamePlayer()
 
 	CurrentState = ECurrentState::No_Battle;
 	PrevState = ECurrentState::No_Battle;
+
+	GetCharacterMovement()->SetIsReplicated(true);
 }
 
 // Called when the game starts or when spawned
@@ -40,7 +42,10 @@ void AInGamePlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Controller = Cast<AInGamePlayerController>(GetController());
+	if (IsLocallyControlled())  // 로컬 플레이어만
+	{
+		Controller = Cast<AInGamePlayerController>(GetController());
+	}
 }
 
 // Called every frame
@@ -48,17 +53,19 @@ void AInGamePlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-
-	if (bIsComboRotating)
+	if (HasAuthority())
 	{
-		FRotator CurrentRot = GetActorRotation();
-
-		FRotator NewRot = FMath::RInterpTo(CurrentRot, TargetAttackRotation, DeltaTime, ComboRotationSpeed);
-		SetActorRotation(NewRot);
-
-		if (CurrentRot.Equals(TargetAttackRotation, 1.0f))
+		if (bIsComboRotating)
 		{
-			bIsComboRotating = false;
+			FRotator CurrentRot = GetActorRotation();
+
+			FRotator NewRot = FMath::RInterpTo(CurrentRot, TargetAttackRotation, DeltaTime, ComboRotationSpeed);
+			SetActorRotation(NewRot);
+
+			if (CurrentRot.Equals(TargetAttackRotation, 1.0f))
+			{
+				bIsComboRotating = false;
+			}
 		}
 	}
 
@@ -141,7 +148,7 @@ void AInGamePlayer::No_Battle(const FInputActionValue& Value)
 {
 	if (CurrentState == ECurrentState::Battle || CurrentState == ECurrentState::Guard)
 	{
-		SetCurrentState(ECurrentState::No_Battle);
+		C2S_SetCurrentState(ECurrentState::No_Battle);
 		GetCharacterMovement()->bOrientRotationToMovement = true;
 	}
 }
@@ -150,16 +157,26 @@ void AInGamePlayer::GuardStart(const FInputActionValue& Value)
 {
 	if (CurrentState == ECurrentState::Battle)
 	{
-		GuardStartTime = GetWorld()->GetGameState()->GetServerWorldTimeSeconds();
-		SetCurrentState(ECurrentState::Guard);
+		C2S_GuardStart();
 	}
+}
+
+bool AInGamePlayer::C2S_GuardStart_Validate()
+{
+	return true;
+}
+
+void AInGamePlayer::C2S_GuardStart_Implementation()
+{
+	GuardStartTime = GetWorld()->GetGameState()->GetServerWorldTimeSeconds();
+	SetCurrentState(ECurrentState::Guard);
 }
 
 void AInGamePlayer::GuardEnd(const FInputActionValue& Value)
 {
 	if (CurrentState == ECurrentState::Guard)
 	{
-		SetCurrentState(ECurrentState::Battle);
+		C2S_SetCurrentState(ECurrentState::Battle);
 	}
 }
 
@@ -167,25 +184,53 @@ void AInGamePlayer::Roll(const FInputActionValue& Value)
 {
 	if (CurrentState == ECurrentState::No_Battle)
 	{
-		PrevState = CurrentState;
-		SetCurrentState(ECurrentState::Rolling);
-		Rolling();
+		C2S_Roll(CurrentState);
 	}
 	else if (CurrentState != ECurrentState::Rolling && CurrentState != ECurrentState::On_Damaged)
 	{
-		PrevState = ECurrentState::Battle;
-		SetCurrentState(ECurrentState::Rolling);
-		Rolling();
+		C2S_Roll(ECurrentState::Battle);
 	}
 }
 
+bool AInGamePlayer::C2S_Roll_Validate(ECurrentState InPrevState)
+{
+	return true;
+}
+
+void AInGamePlayer::C2S_Roll_Implementation(ECurrentState InPrevState)
+{
+	PrevState = InPrevState;
+	SetCurrentState(ECurrentState::Rolling);
+	Rolling();
+}
+
 void AInGamePlayer::RunStart(const FInputActionValue& Value)
+{
+	C2S_RunStart();
+}
+
+bool AInGamePlayer::C2S_RunStart_Validate()
+{
+	return true;
+}
+
+void AInGamePlayer::C2S_RunStart_Implementation()
 {
 	CurrentMoveState = EMoveState::Run;
 	UpdateMoveSpeed();
 }
 
 void AInGamePlayer::RunEnd(const FInputActionValue& Value)
+{
+	C2S_RunEnd();
+}
+
+bool AInGamePlayer::C2S_RunEnd_Validate()
+{
+	return true;
+}
+
+void AInGamePlayer::C2S_RunEnd_Implementation()
 {
 	CurrentMoveState = EMoveState::Idle;
 	UpdateMoveSpeed();
@@ -200,6 +245,23 @@ void AInGamePlayer::Interact(const FInputActionValue& Value)
 	}
 }
 
+void AInGamePlayer::OnRep_CurrentState()
+{
+	Super::OnRep_CurrentState();
+	OnStateChanged.ExecuteIfBound(CurrentState);
+	UpdateMoveSpeed();
+}
+
+bool AInGamePlayer::C2S_SetCurrentState_Validate(ECurrentState NewState)
+{
+	return true;
+}
+
+void AInGamePlayer::C2S_SetCurrentState_Implementation(ECurrentState NewState)
+{
+	SetCurrentState(NewState);
+}
+
 void AInGamePlayer::SetCurrentState(ECurrentState NewState)
 {
 	Super::SetCurrentState(NewState);
@@ -211,6 +273,8 @@ void AInGamePlayer::SetCurrentState(ECurrentState NewState)
 
 void AInGamePlayer::UpdateMoveSpeed()
 {
+	if (!HasAuthority()) return;
+
 	switch (CurrentState)
 	{
 	case ECurrentState::No_Battle:

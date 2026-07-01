@@ -5,6 +5,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/GameStateBase.h"
 #include "InGamePlayer.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 AHuman::AHuman()
@@ -61,6 +62,16 @@ void AHuman::Tick(float DeltaTime)
 			Posture = FMath::Clamp(Posture - (PostureHeal * 0.01f), 0.0f, MaxPosture);
 		}
 	}
+}
+
+void AHuman::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AHuman, CurrentState);
+}
+
+void AHuman::OnRep_CurrentState()
+{
 }
 
 void AHuman::SetCurrentState(ECurrentState NewState)

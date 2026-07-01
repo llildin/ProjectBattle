@@ -93,18 +93,45 @@ public:
 
 	void GuardStart(const FInputActionValue& Value);
 
+	UFUNCTION(Server, Reliable)
+	void C2S_GuardStart();
+	bool C2S_GuardStart_Validate();
+	void C2S_GuardStart_Implementation();
+
 	void GuardEnd(const FInputActionValue& Value);
 
 	void Roll(const FInputActionValue& Value);
 
+	UFUNCTION(Server, Reliable)
+	void C2S_Roll(ECurrentState InPrevState);
+	bool C2S_Roll_Validate(ECurrentState InPrevState);
+	void C2S_Roll_Implementation(ECurrentState InPrevState);
+
 	void RunStart(const FInputActionValue& Value);
 
+	UFUNCTION(Server, Reliable)
+	void C2S_RunStart();
+	bool C2S_RunStart_Validate();
+	void C2S_RunStart_Implementation();
+
 	void RunEnd(const FInputActionValue& Value);
+
+	UFUNCTION(Server, Reliable)
+	void C2S_RunEnd();
+	bool C2S_RunEnd_Validate();
+	void C2S_RunEnd_Implementation();
 
 	void Interact(const FInputActionValue& Value);
 
 
 	//Player ป๓ลย
+
+	virtual void OnRep_CurrentState() override;
+
+	UFUNCTION(Server, Reliable)
+	void C2S_SetCurrentState(ECurrentState NewState);
+	bool C2S_SetCurrentState_Validate(ECurrentState NewState);
+	void C2S_SetCurrentState_Implementation(ECurrentState NewState);
 
 	EMoveState CurrentMoveState = EMoveState::Idle;
 

@@ -50,8 +50,14 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	virtual void GetLifetimeReplicatedProps(
+		TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State", ReplicatedUsing = OnRep_CurrentState)
 	ECurrentState CurrentState;
+
+	UFUNCTION()
+	virtual void OnRep_CurrentState();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
 	ECurrentState PrevState;
