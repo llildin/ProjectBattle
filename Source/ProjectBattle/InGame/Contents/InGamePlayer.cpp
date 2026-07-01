@@ -14,6 +14,7 @@
 #include "InGamePlayerController.h"
 #include "InGame/AttackFunction.h"
 #include "GameFramework/GameStateBase.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 AInGamePlayer::AInGamePlayer()
@@ -100,6 +101,12 @@ void AInGamePlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	}
 }
 
+void AInGamePlayer::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AInGamePlayer, CurrentMoveState);
+}
+
 void AInGamePlayer::Move(const FInputActionValue& Value)
 {
 	if (CurrentState == ECurrentState::No_Battle || CurrentState == ECurrentState::Battle || CurrentState == ECurrentState::Guard)
@@ -148,9 +155,20 @@ void AInGamePlayer::No_Battle(const FInputActionValue& Value)
 {
 	if (CurrentState == ECurrentState::Battle || CurrentState == ECurrentState::Guard)
 	{
-		C2S_SetCurrentState(ECurrentState::No_Battle);
+		C2S_No_Battle();
 		GetCharacterMovement()->bOrientRotationToMovement = true;
 	}
+}
+
+bool AInGamePlayer::C2S_No_Battle_Validate()
+{
+	return true;
+}
+
+void AInGamePlayer::C2S_No_Battle_Implementation()
+{
+	SetCurrentState(ECurrentState::No_Battle);
+	GetCharacterMovement()->bOrientRotationToMovement = true;
 }
 
 void AInGamePlayer::GuardStart(const FInputActionValue& Value)
@@ -273,8 +291,6 @@ void AInGamePlayer::SetCurrentState(ECurrentState NewState)
 
 void AInGamePlayer::UpdateMoveSpeed()
 {
-	if (!HasAuthority()) return;
-
 	switch (CurrentState)
 	{
 	case ECurrentState::No_Battle:
@@ -307,15 +323,13 @@ void AInGamePlayer::UpdateMoveSpeed()
 
 void AInGamePlayer::BasicCheckComboAttack()
 {
+	if (!IsLocallyControlled())
+	{
+		return;
+	}
+
 	if (PlayingBasicComboAttackIndex != BasicComboAttackCount)
 	{
-		FRotator CameraRot = GetControlRotation();
-		TargetAttackRotation = FRotator(0.f, CameraRot.Yaw, 0.f);
-
-		bUseControllerRotationYaw = false;
-
-		bIsComboRotating = true;
-
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		if (AnimInstance)
 		{
@@ -323,11 +337,19 @@ void AInGamePlayer::BasicCheckComboAttack()
 			AnimInstance->OnMontageEnded.AddDynamic(this, &AInGamePlayer::OnAttackMontageEnded);
 		}
 
-
-
-		PlayBasicComboAttackMontage();
-		PlayingBasicComboAttackIndex = BasicComboAttackCount;
+		FRotator CameraRot = GetControlRotation();
+		C2S_BasicCheckComboAttack(CameraRot);
 	}
+}
+
+void AInGamePlayer::C2S_BasicCheckComboAttack_Implementation(FRotator CameraRotation)
+{
+	TargetAttackRotation = FRotator(0.f, CameraRotation.Yaw, 0.f);
+	bUseControllerRotationYaw = false;
+	bIsComboRotating = true;
+
+	PlayBasicComboAttackMontage();
+	PlayingBasicComboAttackIndex = BasicComboAttackCount;
 }
 
 void AInGamePlayer::BasicComboAttack()
@@ -337,54 +359,72 @@ void AInGamePlayer::BasicComboAttack()
 	{
 		if (!bIsAttacking)
 		{
-			BasicComboAttackCount++;
-
-			PlayBasicComboAttackMontage();
-
-			bIsAttacking = true;
-
 			if (CurrentState == ECurrentState::No_Battle)
 			{
-				GetCharacterMovement()->bOrientRotationToMovement = false;
-
 				FRotator StartRotator = GetControlRotation();
 				FRotator EndRotator = GetActorRotation();
 				EndRotator.Pitch = -40.0f;
 				EndRotator.Roll = 0.0f;
 				BattleCameraSetting(StartRotator, EndRotator);
+				GetCharacterMovement()->bOrientRotationToMovement = false;
 			}
 
-			SetCurrentState(ECurrentState::Attack);
-
-			PlayingBasicComboAttackIndex = BasicComboAttackCount;
+			C2S_BasicComboAttack(GetControlRotation(), CurrentState);
 		}
 		else if (bIsAttacking && PlayingBasicComboAttackIndex == BasicComboAttackCount)
 		{
-			BasicComboAttackCount++;
+			C2S_AddComboCount();
 		}
 	}
 }
 
+void AInGamePlayer::C2S_BasicComboAttack_Implementation(FRotator CameraRotation, ECurrentState InCurrentState)
+{
+	BasicComboAttackCount++;
+	PlayBasicComboAttackMontage();
+	bIsAttacking = true;
+
+	if (InCurrentState == ECurrentState::No_Battle)
+	{
+		GetCharacterMovement()->bOrientRotationToMovement = false;
+	}
+
+	SetCurrentState(ECurrentState::Attack);
+	PlayingBasicComboAttackIndex = BasicComboAttackCount;
+}
+
+void AInGamePlayer::C2S_AddComboCount_Implementation()
+{
+	BasicComboAttackCount++;
+}
+
 void AInGamePlayer::PlayBasicComboAttackMontage()
 {
+	AttackSectionName = FString::Printf(TEXT("BasicAttack0%d"), BasicComboAttackCount);
+	S2C_PlayBasicComboAttackMontage(FName(AttackSectionName));
+}
+
+void AInGamePlayer::S2C_PlayBasicComboAttackMontage_Implementation(FName SectionName)
+{
+	AttackSectionName = SectionName.ToString();
+
 	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
 	{
-		AttackSectionName = FString::Printf(TEXT("BasicAttack0%d"), BasicComboAttackCount);
-
-		float MontageLength = PlayAnimMontage(BasicComboAttackMontage, 1.0f, FName(AttackSectionName));
-
+		float MontageLength = PlayAnimMontage(BasicComboAttackMontage, 1.0f, SectionName);
 		if (MontageLength > 0)
 		{
 			FOnMontageEnded EndDelegate;
-
 			EndDelegate.BindLambda([WeakThis = TWeakObjectPtr<AInGamePlayer>(this)](UAnimMontage* Montage, bool bInterrupted) {
 				if (!bInterrupted && WeakThis.IsValid())
 				{
-					WeakThis->BasicComboAttackCount = 0;
-					WeakThis->PlayingBasicComboAttackIndex = 0;
-					WeakThis->bIsAttacking = false;
-					WeakThis->bUseControllerRotationYaw = false;
-					WeakThis->SetCurrentState(ECurrentState::Battle);
+					if (WeakThis->HasAuthority())
+					{
+						WeakThis->BasicComboAttackCount = 0;
+						WeakThis->PlayingBasicComboAttackIndex = 0;
+						WeakThis->bIsAttacking = false;
+						WeakThis->bUseControllerRotationYaw = false;
+						WeakThis->SetCurrentState(ECurrentState::Battle);
+					}
 				}
 				});
 			AnimInstance->Montage_SetEndDelegate(EndDelegate);
@@ -394,6 +434,11 @@ void AInGamePlayer::PlayBasicComboAttackMontage()
 
 void AInGamePlayer::RefreshAttackSetting()
 {
+	if (!HasAuthority())
+	{
+		return;
+	}
+
 	Super::RefreshAttackSetting();
 
 	BasicComboAttackCount = 0;
@@ -417,27 +462,37 @@ void AInGamePlayer::Rolling()
 {
 	if (bIsAttacking)
 	{
-		StopAnimMontage(BasicComboAttackMontage);
+		S2C_StopAttackMontage();
 		BasicComboAttackCount = 0;
 		PlayingBasicComboAttackIndex = 0;
 		bIsAttacking = false;
 	}
-	
+
+	float Direction = UKismetAnimationLibrary::CalculateDirection(LastInputVector, GetActorRotation());
+	FName SectionName = GetRollingSectionName(Direction);
+	S2C_PlayRollingMontage(SectionName); 
+}
+
+void AInGamePlayer::S2C_StopAttackMontage_Implementation()
+{
+	StopAnimMontage(BasicComboAttackMontage); 
+}
+
+void AInGamePlayer::S2C_PlayRollingMontage_Implementation(FName SectionName)
+{
 	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
-	{		
-		float Direction = UKismetAnimationLibrary::CalculateDirection(LastInputVector, GetActorRotation());
-
-		FName SectionName = GetRollingSectionName(Direction);
+	{
 		float MontageLength = PlayAnimMontage(RollingMontage, 1.0f, SectionName);
-
 		if (MontageLength > 0)
 		{
 			FOnMontageEnded EndDelegate;
-
 			EndDelegate.BindLambda([WeakThis = TWeakObjectPtr<AInGamePlayer>(this)](UAnimMontage* Montage, bool bInterrupted) {
 				if (!bInterrupted && WeakThis.IsValid())
 				{
-					WeakThis->SetCurrentState(WeakThis->PrevState);
+					if (WeakThis->HasAuthority())
+					{
+						WeakThis->SetCurrentState(WeakThis->PrevState);
+					}
 				}
 				});
 			AnimInstance->Montage_SetEndDelegate(EndDelegate);
@@ -467,20 +522,29 @@ FName AInGamePlayer::GetRollingSectionName(float Direction)
 
 void AInGamePlayer::BasicAttackTrace()
 {
-	UAttackFunction::BasicAttackTraceShot(DT_AttackData, AttackSectionName, this);
+	if (HasAuthority())
+	{
+		UAttackFunction::BasicAttackTraceShot(DT_AttackData, AttackSectionName, this);
+	}
 }
 
 float AInGamePlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	UpDateUI();
+	if (IsLocallyControlled())
+	{
+		UpDateUI();
+	}
 
 	return 0.0f;
 }
 
 void AInGamePlayer::UpDateUI()
 {
-	Controller->CallRefreshPlayerStat(HP, MaxHP, Posture, MaxPosture);
+	if (Controller)
+	{
+		Controller->CallRefreshPlayerStat(HP, MaxHP, Posture, MaxPosture);
+	}
 }
 

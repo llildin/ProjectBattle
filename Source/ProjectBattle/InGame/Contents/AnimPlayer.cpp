@@ -28,6 +28,14 @@ void UAnimPlayer::NativeUpdateAnimation(float DeltaSeconds)
 		Speed = Player->GetCharacterMovement()->Velocity.Size2D();
 		Direction = UKismetAnimationLibrary::CalculateDirection(Player->GetCharacterMovement()->Velocity, Player->GetActorRotation());
 	}
+	else
+	{
+		Player = Cast<AInGamePlayer>(TryGetPawnOwner());
+		if (Player)
+		{
+			Player->OnStateChanged.BindUObject(this, &UAnimPlayer::OnCurrentStateChanged);
+		}
+	}
 }
 
 

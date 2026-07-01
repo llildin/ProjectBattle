@@ -83,6 +83,9 @@ public:
 	
 	AInGamePlayerController* Controller;
 
+	virtual void GetLifetimeReplicatedProps(
+		TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 
 	//Input 호출 함수
 	void Move(const FInputActionValue& Value);
@@ -90,6 +93,11 @@ public:
 	void Look(const FInputActionValue& Value);
 
 	void No_Battle(const FInputActionValue& Value);
+
+	UFUNCTION(Server, Reliable)
+	void C2S_No_Battle();
+	bool C2S_No_Battle_Validate();
+	void C2S_No_Battle_Implementation();
 
 	void GuardStart(const FInputActionValue& Value);
 
@@ -133,6 +141,7 @@ public:
 	bool C2S_SetCurrentState_Validate(ECurrentState NewState);
 	void C2S_SetCurrentState_Implementation(ECurrentState NewState);
 
+	UPROPERTY(Replicated)
 	EMoveState CurrentMoveState = EMoveState::Idle;
 
 	DECLARE_DELEGATE_OneParam(FOnStateChanged, ECurrentState)
@@ -153,10 +162,26 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void BasicCheckComboAttack();
 
+	UFUNCTION(Server, Reliable)
+	void C2S_BasicCheckComboAttack(FRotator CameraRotation);
+	void C2S_BasicCheckComboAttack_Implementation(FRotator CameraRotation);
+
 	UFUNCTION(BlueprintCallable)
 	void BasicComboAttack();
 
+	UFUNCTION(Server, Reliable)
+	void C2S_BasicComboAttack(FRotator CameraRotation, ECurrentState InCurrentState);
+	void C2S_BasicComboAttack_Implementation(FRotator CameraRotation, ECurrentState InCurrentState);
+
+	UFUNCTION(Server, Reliable)
+	void C2S_AddComboCount();
+	void C2S_AddComboCount_Implementation();
+
 	void PlayBasicComboAttackMontage();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void S2C_PlayBasicComboAttackMontage(FName SectionName);
+	void S2C_PlayBasicComboAttackMontage_Implementation(FName SectionName);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
 	TObjectPtr<UAnimMontage> BasicComboAttackMontage;
@@ -186,6 +211,14 @@ public:
 	TObjectPtr<UAnimMontage> RollingMontage;
 
 	void Rolling();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void S2C_StopAttackMontage();
+	void S2C_StopAttackMontage_Implementation();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void S2C_PlayRollingMontage(FName SectionName);
+	void S2C_PlayRollingMontage_Implementation(FName SectionName);
 
 	FName GetRollingSectionName(float Direction);
 
