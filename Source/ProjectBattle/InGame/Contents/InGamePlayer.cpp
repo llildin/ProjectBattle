@@ -504,12 +504,14 @@ float AInGamePlayer::TakeDamage(float DamageAmount, FDamageEvent const& DamageEv
 {
 	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 
-	if (IsLocallyControlled())
-	{
-		UpDateUI();
-	}
+	S2C_UpDateUI();
 
 	return 0.0f;
+}
+
+void AInGamePlayer::S2C_UpDateUI_Implementation()
+{
+	UpDateUI();
 }
 
 void AInGamePlayer::UpDateUI()

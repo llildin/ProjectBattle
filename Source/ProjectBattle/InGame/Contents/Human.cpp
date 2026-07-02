@@ -68,6 +68,7 @@ void AHuman::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimePr
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AHuman, CurrentState);
+	DOREPLIFETIME(AHuman, HP);
 }
 
 void AHuman::OnRep_CurrentState()
@@ -86,6 +87,7 @@ void AHuman::RefreshAttackSetting()
 {
 }
 
+// 서버에서만 실행
 float AHuman::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
@@ -95,8 +97,6 @@ float AHuman::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 		return 0.0f;
 	}
 
-	HitTime = HIT_TIME;
-
 	if (CurrentState == ECurrentState::Guard)
 	{
 		CheckGuard(ActualDamage, DamageCauser);
@@ -104,6 +104,23 @@ float AHuman::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 		return 0.0f;
 	}
 
+	S2C_TakeDamage(ActualDamage);
+
+	// CurrentState는 Replicated 라 알려주지 않아도 됨
+	SetCurrentState(ECurrentState::On_Damaged);
+
+	// HP는 Replicated라 알려주지 않아도 됨
+	HP = FMath::Clamp(HP - ActualDamage, 0.0f, MaxHP);
+
+	return ActualDamage;
+}
+
+void AHuman::S2C_TakeDamage_Implementation(float ActualDamage)
+{
+	// HitTime -> 클라알려줘야함
+	HitTime = HIT_TIME;
+
+	// S2C로 해줘야함
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance && AnimInstance->IsAnyMontagePlaying())
 	{
@@ -111,18 +128,14 @@ float AHuman::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 		AnimInstance->Montage_Stop(0.1f);
 	}
 
+	// PrevState -> 클라알려줘야함
 	PrevState = CurrentState;
-	SetCurrentState(ECurrentState::On_Damaged);
 
-	if (ActualDamage <= 0.0f) return 0.0f;
-
-	HP = FMath::Clamp(HP - ActualDamage, 0.0f, MaxHP);
-
+	// Posture는 클라알려줘야함
 	Posture = FMath::Clamp(Posture + (ActualDamage * NormalPostureDamageRate), 0.0f, MaxPosture);
-
-	return ActualDamage;
 }
 
+// 서버에서만 실행
 bool AHuman::CheckIsDamaged()
 {
 	if (CurrentState == ECurrentState::Interact || CurrentState == ECurrentState::Rolling ||
@@ -143,24 +156,16 @@ void AHuman::CheckGuard(float Damage, AActor* Attacker)
 
 		if ((CurrentTime - GuardStartTime) <= 0.15f)
 		{
-			MontageLength = PlayAnimMontage(Guard_Perfect_Hit_Montage);
-			Posture = FMath::Clamp(Posture + (Damage * PerfectGuardPostureDamageRate), 0.0f, MaxPosture);
-
-			AHuman* AttackPlayer = Cast<AHuman>(Attacker);
-			AttackPlayer->Posture = FMath::Clamp(AttackPlayer->Posture + (Damage * GuardPostureDamageRate), 0.0f, AttackPlayer->MaxPosture);
-			AttackPlayer->HitTime = HIT_TIME;
-
-			if (AInGamePlayer* InGamePlayer = Cast<AInGamePlayer>(AttackPlayer))
-			{
-				InGamePlayer->UpDateUI();
-			}
+			MontageLength = Guard_Perfect_Hit_Montage->GetPlayLength();
 		}
 		else
 		{
-			MontageLength = PlayAnimMontage(Guard_Hit_Montage);
-			Posture = FMath::Clamp(Posture + (Damage * GuardPostureDamageRate), 0.0f, MaxPosture);
+			MontageLength = Guard_Hit_Montage->GetPlayLength();
 		}
 
+		S2C_CheckGuard(CurrentTime, MontageLength, Damage, Attacker);
+
+		// 이 if문은 서버에서만 실행
 		if (MontageLength > 0)
 		{
 
@@ -174,5 +179,35 @@ void AHuman::CheckGuard(float Damage, AActor* Attacker)
 				});
 			AnimInstance->Montage_SetEndDelegate(EndDelegate);
 		}
+	}
+}
+
+void AHuman::S2C_CheckGuard_Implementation(float CurrentTime, float MontageLength, float Damage, AActor* Attacker)
+{
+	//이 if문 내부 전부 S2C로 구현
+	HitTime = HIT_TIME;
+
+	if ((CurrentTime - GuardStartTime) <= 0.15f)
+	{
+		MontageLength = PlayAnimMontage(Guard_Perfect_Hit_Montage);
+		Posture = FMath::Clamp(Posture + (Damage * PerfectGuardPostureDamageRate), 0.0f, MaxPosture);
+
+		AHuman* AttackPlayer = Cast<AHuman>(Attacker);
+		AttackPlayer->Posture = FMath::Clamp(AttackPlayer->Posture + (Damage * GuardPostureDamageRate), 0.0f, AttackPlayer->MaxPosture);
+		AttackPlayer->HitTime = HIT_TIME;
+
+		//if문으로 AttackPlayer가 본인일 경우만 실행
+		if (AInGamePlayer* InGamePlayer = Cast<AInGamePlayer>(AttackPlayer))
+		{
+			if (InGamePlayer->IsLocallyControlled())
+			{
+				InGamePlayer->UpDateUI();
+			}
+		}
+	}
+	else
+	{
+		MontageLength = PlayAnimMontage(Guard_Hit_Montage);
+		Posture = FMath::Clamp(Posture + (Damage * GuardPostureDamageRate), 0.0f, MaxPosture);
 	}
 }

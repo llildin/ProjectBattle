@@ -70,7 +70,10 @@ void AInGamePlayerController::BeginPlay()
                 bShowMouseCursor = false;
                 SetInputMode(FInputModeGameOnly());
 
-                Player->SetCurrentState(Player->PrevState);
+                if (IsLocalPlayerController())
+                {
+                    Player->SetCurrentState(Player->PrevState);
+                }
             });
     }
 }

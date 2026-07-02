@@ -8,6 +8,16 @@
 
 void UAttackFunction::BasicAttackTraceShot(UDataTable* DT_AttackData, FString AttackSectionName, AActor* Actor)
 {
+	if (!Actor->HasAuthority())
+	{
+		return;
+	}
+
+	if (Actor == nullptr || Actor->GetWorld() == nullptr)
+	{
+		return;
+	}
+
 	if (DT_AttackData == nullptr)
 	{
 		return;

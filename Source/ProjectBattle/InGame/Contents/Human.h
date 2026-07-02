@@ -65,7 +65,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UStaticMeshComponent> Katana;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stat")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stat", Replicated)
 	float HP = 100;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Stat")
@@ -105,6 +105,10 @@ public:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
 		class AController* EventInstigator, AActor* DamageCauser) override;
 
+	UFUNCTION(NetMulticast, Reliable)
+	void S2C_TakeDamage(float ActualDamage);
+	void S2C_TakeDamage_Implementation(float ActualDamage);
+
 	bool CheckIsDamaged();
 
 
@@ -112,6 +116,10 @@ public:
 	float GuardStartTime;
 
 	void CheckGuard(float Damage, AActor* Attacker);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void S2C_CheckGuard(float CurrentTime, float MontageLength, float Damage, AActor* Attacker);
+	void S2C_CheckGuard_Implementation(float CurrentTime, float MontageLength, float Damage, AActor* Attacker);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
 	TObjectPtr<UAnimMontage> Guard_Hit_Montage;

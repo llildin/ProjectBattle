@@ -234,5 +234,9 @@ public:
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
 		class AController* EventInstigator, AActor* DamageCauser) override;
 
+	UFUNCTION(Client, Reliable)
+	void S2C_UpDateUI();
+	void S2C_UpDateUI_Implementation();
+
 	void UpDateUI();
 };
