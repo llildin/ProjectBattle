@@ -111,9 +111,9 @@ public:
 	void Roll(const FInputActionValue& Value);
 
 	UFUNCTION(Server, Reliable)
-	void C2S_Roll(ECurrentState InPrevState);
-	bool C2S_Roll_Validate(ECurrentState InPrevState);
-	void C2S_Roll_Implementation(ECurrentState InPrevState);
+	void C2S_Roll(ECurrentState InPrevState, FName SectionName, bool Attacking);
+	bool C2S_Roll_Validate(ECurrentState InPrevState, FName SectionName, bool Attacking);
+	void C2S_Roll_Implementation(ECurrentState InPrevState, FName SectionName, bool Attacking);
 
 	void RunStart(const FInputActionValue& Value);
 
@@ -204,7 +204,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Stat")
 	TObjectPtr<UAnimMontage> RollingMontage;
 
-	void Rolling();
+	void Rolling(FName SectionName, bool Attacking);
 
 	UFUNCTION(NetMulticast, Reliable)
 	void S2C_StopAttackMontage();

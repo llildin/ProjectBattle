@@ -200,26 +200,29 @@ void AInGamePlayer::GuardEnd(const FInputActionValue& Value)
 
 void AInGamePlayer::Roll(const FInputActionValue& Value)
 {
+	float Direction = UKismetAnimationLibrary::CalculateDirection(LastInputVector, GetActorRotation());
+	FName SectionName = GetRollingSectionName(Direction);
+
 	if (CurrentState == ECurrentState::No_Battle)
 	{
-		C2S_Roll(CurrentState);
+		C2S_Roll(CurrentState, SectionName, bIsAttacking);
 	}
 	else if (CurrentState != ECurrentState::Rolling && CurrentState != ECurrentState::On_Damaged)
 	{
-		C2S_Roll(ECurrentState::Battle);
+		C2S_Roll(ECurrentState::Battle, SectionName, bIsAttacking);
 	}
 }
 
-bool AInGamePlayer::C2S_Roll_Validate(ECurrentState InPrevState)
+bool AInGamePlayer::C2S_Roll_Validate(ECurrentState InPrevState, FName SectionName, bool Attacking)
 {
 	return true;
 }
 
-void AInGamePlayer::C2S_Roll_Implementation(ECurrentState InPrevState)
+void AInGamePlayer::C2S_Roll_Implementation(ECurrentState InPrevState, FName SectionName, bool Attacking)
 {
 	PrevState = InPrevState;
 	SetCurrentState(ECurrentState::Rolling);
-	Rolling();
+	Rolling(SectionName, Attacking);
 }
 
 void AInGamePlayer::RunStart(const FInputActionValue& Value)
@@ -326,7 +329,7 @@ void AInGamePlayer::BasicCheckComboAttack()
 		}
 		FRotator CameraRot = GetControlRotation();
 		FName SectionName = FName(FString::Printf(TEXT("BasicAttack0%d"), BasicComboAttackCount));
-		C2S_BasicCheckComboAttack(CameraRot, SectionName);  // ✅ 섹션 이름 전달
+		C2S_BasicCheckComboAttack(CameraRot, SectionName);
 	}
 }
 
@@ -335,7 +338,7 @@ void AInGamePlayer::C2S_BasicCheckComboAttack_Implementation(FRotator CameraRota
 	TargetAttackRotation = FRotator(0.f, CameraRotation.Yaw, 0.f);
 	bUseControllerRotationYaw = false;
 	bIsComboRotating = true;
-	S2C_PlayBasicComboAttackMontage(SectionName);  // ✅ 섹션 이름 그대로 전달
+	S2C_PlayBasicComboAttackMontage(SectionName);
 }
 
 void AInGamePlayer::BasicComboAttack()
@@ -358,18 +361,18 @@ void AInGamePlayer::BasicComboAttack()
 			bIsAttacking = true;
 			PlayingBasicComboAttackIndex = BasicComboAttackCount;
 			FName SectionName = FName(FString::Printf(TEXT("BasicAttack0%d"), BasicComboAttackCount));
-			C2S_BasicComboAttack(GetControlRotation(), CurrentState, SectionName);  // ✅ 섹션 이름 전달
+			C2S_BasicComboAttack(GetControlRotation(), CurrentState, SectionName);
 		}
 		else if (bIsAttacking && PlayingBasicComboAttackIndex == BasicComboAttackCount)
 		{
-			BasicComboAttackCount++;  // 클라이언트에서만 관리
+			BasicComboAttackCount++;
 		}
 	}
 }
 
 void AInGamePlayer::C2S_BasicComboAttack_Implementation(FRotator CameraRotation, ECurrentState InCurrentState, FName SectionName)
 {
-	S2C_PlayBasicComboAttackMontage(SectionName);  // ✅ 섹션 이름 전달
+	S2C_PlayBasicComboAttackMontage(SectionName);
 	if (InCurrentState == ECurrentState::No_Battle)
 		GetCharacterMovement()->bOrientRotationToMovement = false;
 	SetCurrentState(ECurrentState::Attack);
@@ -377,7 +380,6 @@ void AInGamePlayer::C2S_BasicComboAttack_Implementation(FRotator CameraRotation,
 
 void AInGamePlayer::PlayBasicComboAttackMontage()
 {
-	// ✅ 더 이상 사용 안함 (C2S에서 직접 섹션 전달)
 }
 
 void AInGamePlayer::S2C_PlayBasicComboAttackMontage_Implementation(FName SectionName)
@@ -392,7 +394,6 @@ void AInGamePlayer::S2C_PlayBasicComboAttackMontage_Implementation(FName Section
 			EndDelegate.BindLambda([WeakThis = TWeakObjectPtr<AInGamePlayer>(this)](UAnimMontage* Montage, bool bInterrupted) {
 				if (!bInterrupted && WeakThis.IsValid())
 				{
-					// ✅ 서버는 상태 변경, 클라이언트는 변수 초기화
 					if (WeakThis->HasAuthority())
 					{
 						WeakThis->SetCurrentState(ECurrentState::Battle);
@@ -400,7 +401,6 @@ void AInGamePlayer::S2C_PlayBasicComboAttackMontage_Implementation(FName Section
 					
 					if (WeakThis->IsLocallyControlled())
 					{
-						// ✅ 클라이언트에서 변수 초기화
 						WeakThis->BasicComboAttackCount = 0;
 						WeakThis->PlayingBasicComboAttackIndex = 0;
 						WeakThis->bIsAttacking = false;
@@ -416,7 +416,6 @@ void AInGamePlayer::S2C_PlayBasicComboAttackMontage_Implementation(FName Section
 void AInGamePlayer::RefreshAttackSetting()
 {
 	Super::RefreshAttackSetting();
-	// ✅ HasAuthority 제거: 클라이언트도 초기화 필요
 	BasicComboAttackCount = 0;
 	PlayingBasicComboAttackIndex = 0;
 	bIsAttacking = false;
@@ -434,23 +433,20 @@ void AInGamePlayer::OnAttackMontageEnded(UAnimMontage* Montage, bool bInterrupte
 	}
 }
 
-void AInGamePlayer::Rolling()
+void AInGamePlayer::Rolling(FName SectionName, bool Attacking)
 {
-	if (bIsAttacking)
+	if (Attacking)
 	{
 		S2C_StopAttackMontage();
-		BasicComboAttackCount = 0;
-		PlayingBasicComboAttackIndex = 0;
-		bIsAttacking = false;
 	}
-
-	float Direction = UKismetAnimationLibrary::CalculateDirection(LastInputVector, GetActorRotation());
-	FName SectionName = GetRollingSectionName(Direction);
 	S2C_PlayRollingMontage(SectionName);
 }
 
 void AInGamePlayer::S2C_StopAttackMontage_Implementation()
 {
+	BasicComboAttackCount = 0;
+	PlayingBasicComboAttackIndex = 0;
+	bIsAttacking = false;
 	StopAnimMontage(BasicComboAttackMontage);
 }
 
