@@ -29,8 +29,6 @@ void ULobbyMainUI::NativeConstruct()
 	}
 
 	SetInfo();
-
-	SetSessionInfos();
 }
 
 void ULobbyMainUI::SetInfo()

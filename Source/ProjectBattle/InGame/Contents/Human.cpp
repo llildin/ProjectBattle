@@ -87,7 +87,6 @@ void AHuman::RefreshAttackSetting()
 {
 }
 
-// 서버에서만 실행
 float AHuman::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
@@ -106,10 +105,8 @@ float AHuman::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 
 	S2C_TakeDamage(ActualDamage);
 
-	// CurrentState는 Replicated 라 알려주지 않아도 됨
 	SetCurrentState(ECurrentState::On_Damaged);
 
-	// HP는 Replicated라 알려주지 않아도 됨
 	HP = FMath::Clamp(HP - ActualDamage, 0.0f, MaxHP);
 
 	return ActualDamage;
@@ -117,10 +114,8 @@ float AHuman::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 
 void AHuman::S2C_TakeDamage_Implementation(float ActualDamage)
 {
-	// HitTime -> 클라알려줘야함
 	HitTime = HIT_TIME;
 
-	// S2C로 해줘야함
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance && AnimInstance->IsAnyMontagePlaying())
 	{
@@ -128,14 +123,11 @@ void AHuman::S2C_TakeDamage_Implementation(float ActualDamage)
 		AnimInstance->Montage_Stop(0.1f);
 	}
 
-	// PrevState -> 클라알려줘야함
 	PrevState = CurrentState;
 
-	// Posture는 클라알려줘야함
 	Posture = FMath::Clamp(Posture + (ActualDamage * NormalPostureDamageRate), 0.0f, MaxPosture);
 }
 
-// 서버에서만 실행
 bool AHuman::CheckIsDamaged()
 {
 	if (CurrentState == ECurrentState::Interact || CurrentState == ECurrentState::Rolling ||
@@ -165,7 +157,6 @@ void AHuman::CheckGuard(float Damage, AActor* Attacker)
 
 		S2C_CheckGuard(CurrentTime, MontageLength, Damage, Attacker);
 
-		// 이 if문은 서버에서만 실행
 		if (MontageLength > 0)
 		{
 
@@ -184,7 +175,6 @@ void AHuman::CheckGuard(float Damage, AActor* Attacker)
 
 void AHuman::S2C_CheckGuard_Implementation(float CurrentTime, float MontageLength, float Damage, AActor* Attacker)
 {
-	//이 if문 내부 전부 S2C로 구현
 	HitTime = HIT_TIME;
 
 	if ((CurrentTime - GuardStartTime) <= 0.15f)
@@ -196,7 +186,6 @@ void AHuman::S2C_CheckGuard_Implementation(float CurrentTime, float MontageLengt
 		AttackPlayer->Posture = FMath::Clamp(AttackPlayer->Posture + (Damage * GuardPostureDamageRate), 0.0f, AttackPlayer->MaxPosture);
 		AttackPlayer->HitTime = HIT_TIME;
 
-		//if문으로 AttackPlayer가 본인일 경우만 실행
 		if (AInGamePlayer* InGamePlayer = Cast<AInGamePlayer>(AttackPlayer))
 		{
 			if (InGamePlayer->IsLocallyControlled())
