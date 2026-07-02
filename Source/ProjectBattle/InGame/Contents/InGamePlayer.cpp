@@ -224,34 +224,18 @@ void AInGamePlayer::C2S_Roll_Implementation(ECurrentState InPrevState)
 
 void AInGamePlayer::RunStart(const FInputActionValue& Value)
 {
-	C2S_RunStart();
-}
-
-bool AInGamePlayer::C2S_RunStart_Validate()
-{
-	return true;
-}
-
-void AInGamePlayer::C2S_RunStart_Implementation()
-{
-	CurrentMoveState = EMoveState::Run;
-	UpdateMoveSpeed();
+	C2S_Run(EMoveState::Run);
 }
 
 void AInGamePlayer::RunEnd(const FInputActionValue& Value)
 {
-	C2S_RunEnd();
+	C2S_Run(EMoveState::Idle);
 }
 
-bool AInGamePlayer::C2S_RunEnd_Validate()
+void AInGamePlayer::C2S_Run_Implementation(EMoveState State)
 {
-	return true;
-}
-
-void AInGamePlayer::C2S_RunEnd_Implementation()
-{
-	CurrentMoveState = EMoveState::Idle;
-	UpdateMoveSpeed();
+	CurrentMoveState = State;
+	OnRep_CurrentMoveState();
 }
 
 void AInGamePlayer::Interact(const FInputActionValue& Value)
@@ -278,6 +262,11 @@ bool AInGamePlayer::C2S_SetCurrentState_Validate(ECurrentState NewState)
 void AInGamePlayer::C2S_SetCurrentState_Implementation(ECurrentState NewState)
 {
 	SetCurrentState(NewState);
+}
+
+void AInGamePlayer::OnRep_CurrentMoveState()
+{
+	UpdateMoveSpeed();
 }
 
 void AInGamePlayer::SetCurrentState(ECurrentState NewState)

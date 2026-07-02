@@ -117,17 +117,12 @@ public:
 
 	void RunStart(const FInputActionValue& Value);
 
-	UFUNCTION(Server, Reliable)
-	void C2S_RunStart();
-	bool C2S_RunStart_Validate();
-	void C2S_RunStart_Implementation();
-
 	void RunEnd(const FInputActionValue& Value);
 
 	UFUNCTION(Server, Reliable)
-	void C2S_RunEnd();
-	bool C2S_RunEnd_Validate();
-	void C2S_RunEnd_Implementation();
+	void C2S_Run(EMoveState State);
+	void C2S_Run_Implementation(EMoveState State);
+
 
 	void Interact(const FInputActionValue& Value);
 
@@ -141,8 +136,11 @@ public:
 	bool C2S_SetCurrentState_Validate(ECurrentState NewState);
 	void C2S_SetCurrentState_Implementation(ECurrentState NewState);
 
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing = OnRep_CurrentMoveState)
 	EMoveState CurrentMoveState = EMoveState::Idle;
+
+	UFUNCTION()
+	void OnRep_CurrentMoveState();
 
 	DECLARE_DELEGATE_OneParam(FOnStateChanged, ECurrentState)
 	FOnStateChanged OnStateChanged;
