@@ -19,7 +19,7 @@
 // Sets default values
 AInGamePlayer::AInGamePlayer()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
@@ -28,7 +28,7 @@ AInGamePlayer::AInGamePlayer()
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
-	
+
 
 	GetCharacterMovement()->MaxWalkSpeed = 300.0f;
 
@@ -312,38 +312,35 @@ void AInGamePlayer::UpdateMoveSpeed()
 
 void AInGamePlayer::BasicCheckComboAttack()
 {
-	if (!IsLocallyControlled())
-	{
-		return;
-	}
+	if (!IsLocallyControlled()) return;
 
 	if (PlayingBasicComboAttackIndex != BasicComboAttackCount)
 	{
+		PlayingBasicComboAttackIndex = BasicComboAttackCount;
+
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		if (AnimInstance)
 		{
 			AnimInstance->OnMontageEnded.RemoveDynamic(this, &AInGamePlayer::OnAttackMontageEnded);
 			AnimInstance->OnMontageEnded.AddDynamic(this, &AInGamePlayer::OnAttackMontageEnded);
 		}
-
 		FRotator CameraRot = GetControlRotation();
-		C2S_BasicCheckComboAttack(CameraRot);
+		FName SectionName = FName(FString::Printf(TEXT("BasicAttack0%d"), BasicComboAttackCount));
+		C2S_BasicCheckComboAttack(CameraRot, SectionName);  // ✅ 섹션 이름 전달
 	}
 }
 
-void AInGamePlayer::C2S_BasicCheckComboAttack_Implementation(FRotator CameraRotation)
+void AInGamePlayer::C2S_BasicCheckComboAttack_Implementation(FRotator CameraRotation, FName SectionName)
 {
 	TargetAttackRotation = FRotator(0.f, CameraRotation.Yaw, 0.f);
 	bUseControllerRotationYaw = false;
 	bIsComboRotating = true;
-
-	PlayBasicComboAttackMontage();
-	PlayingBasicComboAttackIndex = BasicComboAttackCount;
+	S2C_PlayBasicComboAttackMontage(SectionName);  // ✅ 섹션 이름 그대로 전달
 }
 
 void AInGamePlayer::BasicComboAttack()
 {
-	if (CurrentState == ECurrentState::No_Battle || CurrentState == ECurrentState::Battle 
+	if (CurrentState == ECurrentState::No_Battle || CurrentState == ECurrentState::Battle
 		|| CurrentState == ECurrentState::Attack || CurrentState == ECurrentState::Guard)
 	{
 		if (!bIsAttacking)
@@ -357,46 +354,35 @@ void AInGamePlayer::BasicComboAttack()
 				BattleCameraSetting(StartRotator, EndRotator);
 				GetCharacterMovement()->bOrientRotationToMovement = false;
 			}
-
-			C2S_BasicComboAttack(GetControlRotation(), CurrentState);
+			BasicComboAttackCount++;
+			bIsAttacking = true;
+			PlayingBasicComboAttackIndex = BasicComboAttackCount;
+			FName SectionName = FName(FString::Printf(TEXT("BasicAttack0%d"), BasicComboAttackCount));
+			C2S_BasicComboAttack(GetControlRotation(), CurrentState, SectionName);  // ✅ 섹션 이름 전달
 		}
 		else if (bIsAttacking && PlayingBasicComboAttackIndex == BasicComboAttackCount)
 		{
-			C2S_AddComboCount();
+			BasicComboAttackCount++;  // 클라이언트에서만 관리
 		}
 	}
 }
 
-void AInGamePlayer::C2S_BasicComboAttack_Implementation(FRotator CameraRotation, ECurrentState InCurrentState)
+void AInGamePlayer::C2S_BasicComboAttack_Implementation(FRotator CameraRotation, ECurrentState InCurrentState, FName SectionName)
 {
-	BasicComboAttackCount++;
-	PlayBasicComboAttackMontage();
-	bIsAttacking = true;
-
+	S2C_PlayBasicComboAttackMontage(SectionName);  // ✅ 섹션 이름 전달
 	if (InCurrentState == ECurrentState::No_Battle)
-	{
 		GetCharacterMovement()->bOrientRotationToMovement = false;
-	}
-
 	SetCurrentState(ECurrentState::Attack);
-	PlayingBasicComboAttackIndex = BasicComboAttackCount;
-}
-
-void AInGamePlayer::C2S_AddComboCount_Implementation()
-{
-	BasicComboAttackCount++;
 }
 
 void AInGamePlayer::PlayBasicComboAttackMontage()
 {
-	AttackSectionName = FString::Printf(TEXT("BasicAttack0%d"), BasicComboAttackCount);
-	S2C_PlayBasicComboAttackMontage(FName(AttackSectionName));
+	// ✅ 더 이상 사용 안함 (C2S에서 직접 섹션 전달)
 }
 
 void AInGamePlayer::S2C_PlayBasicComboAttackMontage_Implementation(FName SectionName)
 {
 	AttackSectionName = SectionName.ToString();
-
 	if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
 	{
 		float MontageLength = PlayAnimMontage(BasicComboAttackMontage, 1.0f, SectionName);
@@ -406,13 +392,19 @@ void AInGamePlayer::S2C_PlayBasicComboAttackMontage_Implementation(FName Section
 			EndDelegate.BindLambda([WeakThis = TWeakObjectPtr<AInGamePlayer>(this)](UAnimMontage* Montage, bool bInterrupted) {
 				if (!bInterrupted && WeakThis.IsValid())
 				{
+					// ✅ 서버는 상태 변경, 클라이언트는 변수 초기화
 					if (WeakThis->HasAuthority())
 					{
+						WeakThis->SetCurrentState(ECurrentState::Battle);
+					}
+					
+					if (WeakThis->IsLocallyControlled())
+					{
+						// ✅ 클라이언트에서 변수 초기화
 						WeakThis->BasicComboAttackCount = 0;
 						WeakThis->PlayingBasicComboAttackIndex = 0;
 						WeakThis->bIsAttacking = false;
 						WeakThis->bUseControllerRotationYaw = false;
-						WeakThis->SetCurrentState(ECurrentState::Battle);
 					}
 				}
 				});
@@ -423,13 +415,8 @@ void AInGamePlayer::S2C_PlayBasicComboAttackMontage_Implementation(FName Section
 
 void AInGamePlayer::RefreshAttackSetting()
 {
-	if (!HasAuthority())
-	{
-		return;
-	}
-
 	Super::RefreshAttackSetting();
-
+	// ✅ HasAuthority 제거: 클라이언트도 초기화 필요
 	BasicComboAttackCount = 0;
 	PlayingBasicComboAttackIndex = 0;
 	bIsAttacking = false;
@@ -459,12 +446,12 @@ void AInGamePlayer::Rolling()
 
 	float Direction = UKismetAnimationLibrary::CalculateDirection(LastInputVector, GetActorRotation());
 	FName SectionName = GetRollingSectionName(Direction);
-	S2C_PlayRollingMontage(SectionName); 
+	S2C_PlayRollingMontage(SectionName);
 }
 
 void AInGamePlayer::S2C_StopAttackMontage_Implementation()
 {
-	StopAnimMontage(BasicComboAttackMontage); 
+	StopAnimMontage(BasicComboAttackMontage);
 }
 
 void AInGamePlayer::S2C_PlayRollingMontage_Implementation(FName SectionName)
@@ -491,17 +478,17 @@ void AInGamePlayer::S2C_PlayRollingMontage_Implementation(FName SectionName)
 
 FName AInGamePlayer::GetRollingSectionName(float Direction)
 {
-	if (Direction >= -22.5f && Direction < 22.5f)   
+	if (Direction >= -22.5f && Direction < 22.5f)
 		return FName("Forward");
-	if (Direction >= 22.5f && Direction < 67.5f)    
+	if (Direction >= 22.5f && Direction < 67.5f)
 		return FName("Forward_Right");
-	if (Direction >= 67.5f && Direction < 112.5f)   
+	if (Direction >= 67.5f && Direction < 112.5f)
 		return FName("Right");
-	if (Direction >= 112.5f && Direction < 157.5f)                         
+	if (Direction >= 112.5f && Direction < 157.5f)
 		return FName("Backward_Right");
-	if (Direction >= -67.5f && Direction < -22.5f)  
+	if (Direction >= -67.5f && Direction < -22.5f)
 		return FName("Forward_Left");
-	if (Direction >= -112.5f && Direction < -67.5f) 
+	if (Direction >= -112.5f && Direction < -67.5f)
 		return FName("Left");
 	if (Direction >= -157.5f && Direction < -112.5f)
 		return FName("Backward_Left");
@@ -536,4 +523,3 @@ void AInGamePlayer::UpDateUI()
 		Controller->CallRefreshPlayerStat(HP, MaxHP, Posture, MaxPosture);
 	}
 }
-

@@ -161,19 +161,15 @@ public:
 	void BasicCheckComboAttack();
 
 	UFUNCTION(Server, Reliable)
-	void C2S_BasicCheckComboAttack(FRotator CameraRotation);
-	void C2S_BasicCheckComboAttack_Implementation(FRotator CameraRotation);
+	void C2S_BasicCheckComboAttack(FRotator CameraRotation, FName SectionName);
+	void C2S_BasicCheckComboAttack_Implementation(FRotator CameraRotation, FName SectionName);
 
 	UFUNCTION(BlueprintCallable)
 	void BasicComboAttack();
 
 	UFUNCTION(Server, Reliable)
-	void C2S_BasicComboAttack(FRotator CameraRotation, ECurrentState InCurrentState);
-	void C2S_BasicComboAttack_Implementation(FRotator CameraRotation, ECurrentState InCurrentState);
-
-	UFUNCTION(Server, Reliable)
-	void C2S_AddComboCount();
-	void C2S_AddComboCount_Implementation();
+	void C2S_BasicComboAttack(FRotator CameraRotation, ECurrentState InCurrentState, FName SectionName);
+	void C2S_BasicComboAttack_Implementation(FRotator CameraRotation, ECurrentState InCurrentState, FName SectionName);
 
 	void PlayBasicComboAttackMontage();
 
