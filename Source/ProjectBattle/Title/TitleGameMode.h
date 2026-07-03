@@ -13,5 +13,5 @@ UCLASS()
 class PROJECTBATTLE_API ATitleGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+
 };

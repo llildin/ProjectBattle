@@ -10,3 +10,7 @@ void ALobbyPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 	DOREPLIFETIME(ALobbyPlayerState, Nickname);
 }
+
+void ALobbyPlayerState::CopyProperties(APlayerState* NewPlayerState)
+{
+}

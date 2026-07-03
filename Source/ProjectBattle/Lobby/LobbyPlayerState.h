@@ -18,5 +18,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "User", Replicated)
 	FText Nickname;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "User", Replicated)
+	FText Test;
+
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	virtual void CopyProperties(APlayerState* NewPlayerState) override;
 };

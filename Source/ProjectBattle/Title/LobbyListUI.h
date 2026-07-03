@@ -8,6 +8,7 @@
 #include "LobbyListUI.generated.h"
 
 class UTextBlock;
+class ULobbyMainUI;
 
 /**
  * 
@@ -34,4 +35,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<UTextBlock> Txt_PlayerCount;
+
+	void SetLobbyMainUIObject(ULobbyMainUI* MainUI);
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	ULobbyMainUI* LobbyMainUIObject;
 };

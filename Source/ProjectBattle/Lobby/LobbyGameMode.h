@@ -13,5 +13,4 @@ UCLASS()
 class PROJECTBATTLE_API ALobbyGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
-	
 };

@@ -52,6 +52,8 @@ void ULobbyMainUI::SetInfo()
 		RoomList->AddChildToVerticalBox(ChildWidget);
 
 		LobbyListUIObject.Add(ChildWidget);
+
+		ChildWidget->SetLobbyMainUIObject(this);
 	}
 
 	RefreshUI();

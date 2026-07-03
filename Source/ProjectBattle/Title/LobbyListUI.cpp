@@ -3,6 +3,7 @@
 
 #include "Title/LobbyListUI.h"
 #include "Components/TextBlock.h"
+#include "LobbyMainUI.h"
 
 void ULobbyListUI::SetInfo(FBlueprintSessionResult InSessionResult)
 {
@@ -25,4 +26,9 @@ void ULobbyListUI::RefreshUI()
 	FString PlayerCountString = FString::Printf(TEXT("(%d / %d)"), currentPlayers, MaxPlayers);
 
 	Txt_PlayerCount->SetText(FText::FromString(PlayerCountString));
+}
+
+void ULobbyListUI::SetLobbyMainUIObject(ULobbyMainUI* MainUI)
+{
+	LobbyMainUIObject = MainUI;
 }
