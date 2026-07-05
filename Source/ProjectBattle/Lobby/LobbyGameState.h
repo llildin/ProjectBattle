@@ -14,9 +14,6 @@ struct FGameSlotData
 	GENERATED_BODY()
 
     UPROPERTY(BlueprintReadOnly)
-    bool bIsOccupied = false;
-
-    UPROPERTY(BlueprintReadOnly)
     TWeakObjectPtr<APlayerState> OwningPlayerState;
 
     UPROPERTY(BlueprintReadOnly)
@@ -86,4 +83,5 @@ public:
     void SetLobbyRoomUI(ULobbyRoomUI* LobbyRoomUI);
 
     void UpdateSlot(bool IsPlayer01, APlayerState* PlayerState, EGameStatType GameStatType, float UpDown);
+
 };

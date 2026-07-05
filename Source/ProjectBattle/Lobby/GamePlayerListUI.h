@@ -7,6 +7,8 @@
 #include "GamePlayerListUI.generated.h"
 
 class ULobbyRoomUI;
+class UTextBlock;
+class ALobbyGameState;
 
 /**
  * 
@@ -22,4 +24,11 @@ public:
 	TObjectPtr<ULobbyRoomUI> LobbyRoomObject;
 
 	void SetLobbyRoomUI(ULobbyRoomUI* LobbyRoomUI);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (BindWidget))
+	TObjectPtr<UTextBlock> Txt_Nickname;
+
+	ALobbyGameState* LobbyGS;
+
+	void RefreshUI(bool InIsPlayer01);
 };

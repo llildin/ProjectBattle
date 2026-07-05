@@ -11,6 +11,7 @@ class UObserberListUI;
 class UJoinGameUI;
 class UGamePlayerListUI;
 class UBorder;
+class ALobbyGameState;
 
 /**
  * 
@@ -73,4 +74,13 @@ public:
 	TObjectPtr<UBorder> Player02;
 
 	void JoinPlayer(bool InIsPlayer01);
+
+	ALobbyGameState* LobbyGS;
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void C2S_JoinPlayer(bool InIsPlayer01);
+	bool C2S_JoinPlayer_Validate(bool InIsPlayer01);
+	void C2S_JoinPlayer_Implementation(bool InIsPlayer01);
+
+	void Update_JoinPlayer(bool InIsPlayer01);
 };

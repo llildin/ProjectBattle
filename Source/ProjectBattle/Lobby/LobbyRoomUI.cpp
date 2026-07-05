@@ -34,7 +34,7 @@ void ULobbyRoomUI::NativeConstruct()
     Player02_GamePlayerListUIObject = CreateWidget<UGamePlayerListUI>(GetWorld(), Player02_GamePlayerListUIClass);
     Player02_GamePlayerListUIObject->SetLobbyRoomUI(this);
 
-    ALobbyGameState* LobbyGS = Cast<ALobbyGameState>(GetWorld()->GetGameState());
+    LobbyGS = Cast<ALobbyGameState>(GetWorld()->GetGameState());
     if (LobbyGS)
     {
         LobbyGS->SetLobbyRoomUI(this);
@@ -72,13 +72,38 @@ void ULobbyRoomUI::RefreshUI()
 
 void ULobbyRoomUI::RefreshPlayer01UI()
 {
+    if (Player01->GetContent() != Player01_GamePlayerListUIObject)
+    {
+        Update_JoinPlayer(true);
+    }
+    Player01_GamePlayerListUIObject->RefreshUI(true);
 }
 
 void ULobbyRoomUI::RefreshPlayer02UI()
 {
+    if (Player02->GetContent() != Player02_GamePlayerListUIObject)
+    {
+        Update_JoinPlayer(false);
+    }
+    Player02_GamePlayerListUIObject->RefreshUI(false);
 }
 
 void ULobbyRoomUI::JoinPlayer(bool InIsPlayer01)
+{
+    C2S_JoinPlayer(InIsPlayer01);
+}
+
+bool ULobbyRoomUI::C2S_JoinPlayer_Validate(bool InIsPlayer01)
+{
+    return true;
+}
+
+void ULobbyRoomUI::C2S_JoinPlayer_Implementation(bool InIsPlayer01)
+{
+    LobbyGS->UpdateSlot(InIsPlayer01, GetOwningPlayerState(), EGameStatType::Join, 0);
+}
+
+void ULobbyRoomUI::Update_JoinPlayer(bool InIsPlayer01)
 {
     if (InIsPlayer01)
     {
