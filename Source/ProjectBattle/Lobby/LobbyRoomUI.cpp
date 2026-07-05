@@ -7,6 +7,9 @@
 #include "ObserberListUI.h"
 #include "LobbyGameState.h"
 #include "LobbyPlayerState.h"
+#include "Components/Border.h"
+#include "JoinGameUI.h"
+#include "GamePlayerListUI.h"
 
 void ULobbyRoomUI::NativeConstruct()
 {
@@ -16,6 +19,10 @@ void ULobbyRoomUI::NativeConstruct()
     {
         GI->OnLobbyListChanged.AddUObject(this, &ULobbyRoomUI::RefreshUI);
     }
+
+    JoinGameUIObject = CreateWidget<UJoinGameUI>(GetWorld(), JoinGameUIClass);
+    Player01->SetContent(JoinGameUIObject);
+    Player02->SetContent(JoinGameUIObject);
 
     RefreshUI();
 }

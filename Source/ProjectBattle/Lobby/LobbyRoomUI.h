@@ -8,6 +8,9 @@
 
 class UVerticalBox;
 class UObserberListUI;
+class UJoinGameUI;
+class UGamePlayerListUI;
+class UBorder;
 
 /**
  * 
@@ -31,4 +34,29 @@ public:
 
 	UPROPERTY(BlueprintReadWrite)
 	TArray<TObjectPtr<UObserberListUI>> ObserberListUIObject;
+
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TSubclassOf<UJoinGameUI> JoinGameUIClass;
+
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<UJoinGameUI> JoinGameUIObject;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TSubclassOf<UGamePlayerListUI> Player01_GamePlayerListUIClass;
+
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<UGamePlayerListUI> Player01_GamePlayerListUIObject;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TSubclassOf<UGamePlayerListUI> Player02_GamePlayerListUIClass;
+
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<UGamePlayerListUI> Player02_GamePlayerListUIObject;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (BindWidget))
+	TObjectPtr<UBorder> Player01;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (BindWidget))
+	TObjectPtr<UBorder> Player02;
 };
