@@ -18,4 +18,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "User")
 	FString Nickname;
 	
+	DECLARE_MULTICAST_DELEGATE(FOnLobbyListChanged);
+	FOnLobbyListChanged OnLobbyListChanged;
 };
