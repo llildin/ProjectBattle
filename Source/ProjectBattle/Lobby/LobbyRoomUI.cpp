@@ -34,6 +34,12 @@ void ULobbyRoomUI::NativeConstruct()
     Player02_GamePlayerListUIObject = CreateWidget<UGamePlayerListUI>(GetWorld(), Player02_GamePlayerListUIClass);
     Player02_GamePlayerListUIObject->SetLobbyRoomUI(this);
 
+    ALobbyGameState* LobbyGS = Cast<ALobbyGameState>(GetWorld()->GetGameState());
+    if (LobbyGS)
+    {
+        LobbyGS->SetLobbyRoomUI(this);
+    }
+
     RefreshUI();
 }
 

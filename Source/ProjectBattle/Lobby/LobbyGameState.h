@@ -6,6 +6,8 @@
 #include "GameFramework/GameStateBase.h"
 #include "LobbyGameState.generated.h"
 
+class ULobbyRoomUI;
+
 USTRUCT(BlueprintType)
 struct FGameSlotData
 {
@@ -21,16 +23,16 @@ struct FGameSlotData
     FString Nickname;
 
     UPROPERTY(BlueprintReadOnly)
-    int32 MaxHp = 3;
+    float MaxHp = 3.0f;
 
     UPROPERTY(BlueprintReadOnly)
-    int32 MaxPosture = 3;
+    float MaxPosture = 3.0f;
 
     UPROPERTY(BlueprintReadOnly)
-    int32 AttackDamage = 3;
+    float AttackDamage = 3.0f;
 
     UPROPERTY(BlueprintReadOnly)
-    int32 PostureHealing = 3;
+    float PostureHealing = 3.0f;
 
     UPROPERTY(BlueprintReadOnly)
     int32 RemainingPT = 10;
@@ -42,10 +44,11 @@ struct FGameSlotData
 UENUM(BlueprintType)
 enum class EGameStatType : uint8
 {
-    MaxHp = 0 UMETA(DisplayName = "MaxHp"),
-    MaxPosture = 10 UMETA(DisplayName = "MaxPosture"),
-    AttackDamage = 20 UMETA(DisplayName = "AttackDamage"),
-    PostureHealing = 30 UMETA(DisplayName = "PostureHealing")
+    Join = 0 UMETA(DisplayName = "Join"),
+    MaxHp = 10 UMETA(DisplayName = "MaxHp"),
+    MaxPosture = 20 UMETA(DisplayName = "MaxPosture"),
+    AttackDamage = 30 UMETA(DisplayName = "AttackDamage"),
+    PostureHealing = 40 UMETA(DisplayName = "PostureHealing")
 };
 
 /**
@@ -76,4 +79,11 @@ public:
 
     UFUNCTION() void OnRep_PlayerSlot1();
     UFUNCTION() void OnRep_PlayerSlot2();
+
+    UPROPERTY(BlueprintReadWrite)
+    TObjectPtr<ULobbyRoomUI> LobbyRoomObject;
+
+    void SetLobbyRoomUI(ULobbyRoomUI* LobbyRoomUI);
+
+    void UpdateSlot(bool IsPlayer01, APlayerState* PlayerState, EGameStatType GameStatType, float UpDown);
 };

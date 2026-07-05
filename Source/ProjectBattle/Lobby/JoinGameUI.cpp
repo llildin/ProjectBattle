@@ -4,6 +4,7 @@
 #include "Lobby/JoinGameUI.h"
 #include "LobbyRoomUI.h"
 #include "Components/Button.h"
+#include "LobbyGameState.h"
 
 void UJoinGameUI::NativeConstruct()
 {
