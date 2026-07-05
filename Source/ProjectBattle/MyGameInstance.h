@@ -16,6 +16,6 @@ class PROJECTBATTLE_API UMyGameInstance : public UGameInstance
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "User")
-	FText Nickname;
+	FString Nickname;
 	
 };

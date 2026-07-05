@@ -16,12 +16,16 @@ class PROJECTBATTLE_API ALobbyPlayerState : public APlayerState
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "User", Replicated)
-	FText Nickname;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "User", Replicated)
-	FText Test;
+	FString Nickname;
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual void CopyProperties(APlayerState* NewPlayerState) override;
+
+	virtual void BeginPlay() override;
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void C2S_SetNickname(const FString& InName);
+	bool C2S_SetNickname_Validate(const FString& InName);
+	void C2S_SetNickname_Implementation(const FString& InName);
 };
