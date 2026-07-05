@@ -20,9 +20,19 @@ void ULobbyRoomUI::NativeConstruct()
         GI->OnLobbyListChanged.AddUObject(this, &ULobbyRoomUI::RefreshUI);
     }
 
-    JoinGameUIObject = CreateWidget<UJoinGameUI>(GetWorld(), JoinGameUIClass);
-    Player01->SetContent(JoinGameUIObject);
-    Player02->SetContent(JoinGameUIObject);
+    Player01_JoinGameUIObject = CreateWidget<UJoinGameUI>(GetWorld(), Player01_JoinGameUIClass);
+    Player01->SetContent(Player01_JoinGameUIObject);
+    Player01_JoinGameUIObject->SetLobbyRoomUI(this, true);
+
+    Player02_JoinGameUIObject = CreateWidget<UJoinGameUI>(GetWorld(), Player02_JoinGameUIClass);
+    Player02->SetContent(Player02_JoinGameUIObject);
+    Player02_JoinGameUIObject->SetLobbyRoomUI(this, false);
+
+    Player01_GamePlayerListUIObject = CreateWidget<UGamePlayerListUI>(GetWorld(), Player01_GamePlayerListUIClass);
+    Player01_GamePlayerListUIObject->SetLobbyRoomUI(this);
+
+    Player02_GamePlayerListUIObject = CreateWidget<UGamePlayerListUI>(GetWorld(), Player02_GamePlayerListUIClass);
+    Player02_GamePlayerListUIObject->SetLobbyRoomUI(this);
 
     RefreshUI();
 }
@@ -51,5 +61,25 @@ void ULobbyRoomUI::RefreshUI()
         }
 
         ObserberListUIObject.Add(ChildWidget);
+    }
+}
+
+void ULobbyRoomUI::RefreshPlayer01UI()
+{
+}
+
+void ULobbyRoomUI::RefreshPlayer02UI()
+{
+}
+
+void ULobbyRoomUI::JoinPlayer(bool InIsPlayer01)
+{
+    if (InIsPlayer01)
+    {
+        Player01->SetContent(Player01_GamePlayerListUIObject);
+    }
+    else
+    {
+        Player02->SetContent(Player02_GamePlayerListUIObject);
     }
 }

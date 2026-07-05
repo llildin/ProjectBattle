@@ -6,6 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "GamePlayerListUI.generated.h"
 
+class ULobbyRoomUI;
+
 /**
  * 
  */
@@ -14,4 +16,10 @@ class PROJECTBATTLE_API UGamePlayerListUI : public UUserWidget
 {
 	GENERATED_BODY()
 	
+public:
+
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<ULobbyRoomUI> LobbyRoomObject;
+
+	void SetLobbyRoomUI(ULobbyRoomUI* LobbyRoomUI);
 };

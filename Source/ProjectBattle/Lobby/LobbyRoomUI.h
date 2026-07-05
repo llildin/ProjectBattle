@@ -29,6 +29,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void RefreshUI();
 
+	UFUNCTION(BlueprintCallable)
+	void RefreshPlayer01UI();
+
+	UFUNCTION(BlueprintCallable)
+	void RefreshPlayer02UI();
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSubclassOf<UObserberListUI> ObserberListUIClass;
 
@@ -37,10 +43,16 @@ public:
 
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	TSubclassOf<UJoinGameUI> JoinGameUIClass;
+	TSubclassOf<UJoinGameUI> Player01_JoinGameUIClass;
 
 	UPROPERTY(BlueprintReadWrite)
-	TObjectPtr<UJoinGameUI> JoinGameUIObject;
+	TObjectPtr<UJoinGameUI> Player01_JoinGameUIObject;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TSubclassOf<UJoinGameUI> Player02_JoinGameUIClass;
+
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<UJoinGameUI> Player02_JoinGameUIObject;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSubclassOf<UGamePlayerListUI> Player01_GamePlayerListUIClass;
@@ -59,4 +71,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (BindWidget))
 	TObjectPtr<UBorder> Player02;
+
+	void JoinPlayer(bool InIsPlayer01);
 };

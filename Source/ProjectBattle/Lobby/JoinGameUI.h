@@ -7,6 +7,7 @@
 #include "JoinGameUI.generated.h"
 
 class UButton;
+class ULobbyRoomUI;
 
 /**
  * 
@@ -17,5 +18,18 @@ class PROJECTBATTLE_API UJoinGameUI : public UUserWidget
 	GENERATED_BODY()
 	
 public:
+	virtual void NativeConstruct() override;
 
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<ULobbyRoomUI> LobbyRoomObject;
+
+	void SetLobbyRoomUI(ULobbyRoomUI* LobbyRoomUI, bool InIsPlayer01);
+
+	bool IsPlayer01 = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (BindWidget))
+	TObjectPtr<UButton> Btn_JoinGame;
+
+	UFUNCTION()
+	void OnClickedJoinGameButton();
 };

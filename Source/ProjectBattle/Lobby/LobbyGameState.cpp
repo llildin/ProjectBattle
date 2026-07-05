@@ -9,6 +9,8 @@ void ALobbyGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ALobbyGameState, PlayerCount);
+	DOREPLIFETIME(ALobbyGameState, PlayerSlot1);
+	DOREPLIFETIME(ALobbyGameState, PlayerSlot2);
 }
 
 void ALobbyGameState::OnRep_PlayerCount()
@@ -31,4 +33,12 @@ void ALobbyGameState::RemovePlayerState(APlayerState* PlayerState)
 	Super::RemovePlayerState(PlayerState);
 	PlayerCount = PlayerArray.Num();
 	OnRep_PlayerCount();
+}
+
+void ALobbyGameState::OnRep_PlayerSlot1()
+{
+}
+
+void ALobbyGameState::OnRep_PlayerSlot2()
+{
 }
