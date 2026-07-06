@@ -78,3 +78,16 @@ void ALobbyPlayerState::C2S_JoinGame_Implementation()
         GI->OnLobbyListChanged.Broadcast();
     }
 }
+
+bool ALobbyPlayerState::C2S_JoinPlayer_Validate(bool InIsPlayer01)
+{
+    return true;
+}
+
+void ALobbyPlayerState::C2S_JoinPlayer_Implementation(bool InIsPlayer01)
+{
+    if (ALobbyGameState* GS = GetWorld()->GetGameState<ALobbyGameState>())
+    {
+        GS->UpdateSlot(InIsPlayer01, this, EGameStatType::Join, 0);
+    }
+}

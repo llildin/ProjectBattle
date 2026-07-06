@@ -132,6 +132,12 @@ void ALobbyGameState::UpdateSlot(bool IsPlayer01, APlayerState* PlayerState, EGa
 		Slot->bIsReady = false;
 	}
 
-	OnRep_PlayerSlot1();
-	OnRep_PlayerSlot2();
+	if (IsPlayer01)
+	{
+		OnRep_PlayerSlot1();
+	}
+	else
+	{
+		OnRep_PlayerSlot2();
+	}
 }

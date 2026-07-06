@@ -77,10 +77,5 @@ public:
 
 	ALobbyGameState* LobbyGS;
 
-	UFUNCTION(Server, Reliable, WithValidation)
-	void C2S_JoinPlayer(bool InIsPlayer01);
-	bool C2S_JoinPlayer_Validate(bool InIsPlayer01);
-	void C2S_JoinPlayer_Implementation(bool InIsPlayer01);
-
 	void Update_JoinPlayer(bool InIsPlayer01);
 };

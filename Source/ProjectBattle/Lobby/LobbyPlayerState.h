@@ -49,4 +49,9 @@ public:
 	void C2S_JoinGame();
 	bool C2S_JoinGame_Validate();
 	void C2S_JoinGame_Implementation();
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void C2S_JoinPlayer(bool InIsPlayer01);
+	bool C2S_JoinPlayer_Validate(bool InIsPlayer01);
+	void C2S_JoinPlayer_Implementation(bool InIsPlayer01);
 };

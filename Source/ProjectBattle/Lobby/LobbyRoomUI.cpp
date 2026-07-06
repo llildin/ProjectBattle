@@ -90,17 +90,10 @@ void ULobbyRoomUI::RefreshPlayer02UI()
 
 void ULobbyRoomUI::JoinPlayer(bool InIsPlayer01)
 {
-    C2S_JoinPlayer(InIsPlayer01);
-}
-
-bool ULobbyRoomUI::C2S_JoinPlayer_Validate(bool InIsPlayer01)
-{
-    return true;
-}
-
-void ULobbyRoomUI::C2S_JoinPlayer_Implementation(bool InIsPlayer01)
-{
-    LobbyGS->UpdateSlot(InIsPlayer01, GetOwningPlayerState(), EGameStatType::Join, 0);
+    if (ALobbyPlayerState* LobbyPS = Cast<ALobbyPlayerState>(GetOwningPlayerState()))
+    {
+        LobbyPS->C2S_JoinPlayer(InIsPlayer01);
+    }
 }
 
 void ULobbyRoomUI::Update_JoinPlayer(bool InIsPlayer01)
