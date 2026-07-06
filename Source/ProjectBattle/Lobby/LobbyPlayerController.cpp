@@ -8,8 +8,12 @@ void ALobbyPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	
+
 	if (IsLocalPlayerController())
 	{
+		UE_LOG(LogTemp, Warning, TEXT("DDD"));
+
 		LobbyRoomUIObject = CreateWidget<ULobbyRoomUI>(this, LobbyRoomUIClass);
 		LobbyRoomUIObject->AddToViewport();
 		LobbyRoomUIObject->SetVisibility(ESlateVisibility::Visible);

@@ -6,6 +6,7 @@
 #include "GameFramework/GameStateBase.h"
 #include "InGamePlayer.h"
 #include "Net/UnrealNetwork.h"
+#include "InGamePlayerState.h"
 
 // Sets default values
 AHuman::AHuman()
@@ -100,6 +101,11 @@ float AHuman::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	{
 		CheckGuard(ActualDamage, DamageCauser);
 
+		if (Posture >= MaxPosture)
+		{
+			S2C_Winner(DamageCauser);
+		}
+
 		return 0.0f;
 	}
 
@@ -108,6 +114,11 @@ float AHuman::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 	SetCurrentState(ECurrentState::On_Damaged);
 
 	HP = FMath::Clamp(HP - ActualDamage, 0.0f, MaxHP);
+
+	if (HP <= 0)
+	{
+		S2C_Winner(DamageCauser);
+	}
 
 	return ActualDamage;
 }
@@ -198,5 +209,17 @@ void AHuman::S2C_CheckGuard_Implementation(float CurrentTime, float MontageLengt
 	{
 		MontageLength = PlayAnimMontage(Guard_Hit_Montage);
 		Posture = FMath::Clamp(Posture + (Damage * GuardPostureDamageRate), 0.0f, MaxPosture);
+	}
+}
+
+void AHuman::S2C_Winner_Implementation(AActor* DamageCauser)
+{
+	AInGamePlayer* Player = Cast<AInGamePlayer>(DamageCauser);
+
+	AInGamePlayerState* PS = Cast<AInGamePlayerState>(Player->GetPlayerState());
+
+	if (PS)
+	{
+		FinishGameWinner(PS->Nickname);
 	}
 }
