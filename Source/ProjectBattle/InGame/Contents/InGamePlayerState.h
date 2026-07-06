@@ -31,7 +31,7 @@ public:
     float Stat_PostureHealing;
 
     UPROPERTY(Replicated, BlueprintReadOnly)
-    bool IsPlayer = false;
+    bool IsPlayer = true;
 
     virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };
