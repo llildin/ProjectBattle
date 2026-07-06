@@ -78,4 +78,8 @@ public:
 	ALobbyGameState* LobbyGS;
 
 	void Update_JoinPlayer(bool InIsPlayer01);
+
+	void CanclePlayer(bool InIsPlayer01);
+
+	void Update_CanclePlayer(bool InIsPlayer01);
 };

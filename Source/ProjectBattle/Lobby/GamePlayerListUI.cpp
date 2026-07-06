@@ -5,6 +5,68 @@
 #include "LobbyRoomUI.h"
 #include "LobbyGameState.h"
 #include "Components/TextBlock.h"
+#include "Components/Button.h"
+#include "Components/ProgressBar.h"
+#include "LobbyPlayerState.h"
+
+void UGamePlayerListUI::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	if (Btn_Cancle)
+	{
+		Btn_Cancle->OnClicked.RemoveDynamic(this, &UGamePlayerListUI::OnClickedCancleGameButton);
+		Btn_Cancle->OnClicked.AddDynamic(this, &UGamePlayerListUI::OnClickedCancleGameButton);
+	}
+
+	if (Btn_MaxHpDown)
+	{
+		Btn_MaxHpDown->OnClicked.RemoveDynamic(this, &UGamePlayerListUI::OnClickedMaxHpDownGameButton);
+		Btn_MaxHpDown->OnClicked.AddDynamic(this, &UGamePlayerListUI::OnClickedMaxHpDownGameButton);
+	}
+
+	if (Btn_MaxHpUp)
+	{
+		Btn_MaxHpUp->OnClicked.RemoveDynamic(this, &UGamePlayerListUI::OnClickedMaxHpUpGameButton);
+		Btn_MaxHpUp->OnClicked.AddDynamic(this, &UGamePlayerListUI::OnClickedMaxHpUpGameButton);
+	}
+
+	if (Btn_MaxPostureDown)
+	{
+		Btn_MaxPostureDown->OnClicked.RemoveDynamic(this, &UGamePlayerListUI::OnClickedMaxPostureDownGameButton);
+		Btn_MaxPostureDown->OnClicked.AddDynamic(this, &UGamePlayerListUI::OnClickedMaxPostureDownGameButton);
+	}
+
+	if (Btn_MaxPostureUp)
+	{
+		Btn_MaxPostureUp->OnClicked.RemoveDynamic(this, &UGamePlayerListUI::OnClickedMaxPostureUpGameButton);
+		Btn_MaxPostureUp->OnClicked.AddDynamic(this, &UGamePlayerListUI::OnClickedMaxPostureUpGameButton);
+	}
+
+	if (Btn_AttackDamageDown)
+	{
+		Btn_AttackDamageDown->OnClicked.RemoveDynamic(this, &UGamePlayerListUI::OnClickedAttackDamageDownGameButton);
+		Btn_AttackDamageDown->OnClicked.AddDynamic(this, &UGamePlayerListUI::OnClickedAttackDamageDownGameButton);
+	}
+
+	if (Btn_AttackDamageUp)
+	{
+		Btn_AttackDamageUp->OnClicked.RemoveDynamic(this, &UGamePlayerListUI::OnClickedAttackDamageUpGameButton);
+		Btn_AttackDamageUp->OnClicked.AddDynamic(this, &UGamePlayerListUI::OnClickedAttackDamageUpGameButton);
+	}
+
+	if (Btn_PostureHealingDown)
+	{
+		Btn_PostureHealingDown->OnClicked.RemoveDynamic(this, &UGamePlayerListUI::OnClickedPostureHealingDownGameButton);
+		Btn_PostureHealingDown->OnClicked.AddDynamic(this, &UGamePlayerListUI::OnClickedPostureHealingDownGameButton);
+	}
+
+	if (Btn_PostureHealingUp)
+	{
+		Btn_PostureHealingUp->OnClicked.RemoveDynamic(this, &UGamePlayerListUI::OnClickedPostureHealingUpGameButton);
+		Btn_PostureHealingUp->OnClicked.AddDynamic(this, &UGamePlayerListUI::OnClickedPostureHealingUpGameButton);
+	}
+}
 
 void UGamePlayerListUI::SetLobbyRoomUI(ULobbyRoomUI* LobbyRoomUI)
 {
@@ -18,9 +80,102 @@ void UGamePlayerListUI::RefreshUI(bool InIsPlayer01)
 	if (InIsPlayer01)
 	{
 		Txt_Nickname->SetText(FText::FromString(LobbyGS->PlayerSlot1.Nickname));
+		IsPlayer01 = InIsPlayer01;
+
+		Txt_MaxHp->SetText(FText::AsNumber(FMath::RoundToInt(LobbyGS->PlayerSlot1.MaxHp)));
+		Txt_MaxPosture->SetText(FText::AsNumber(FMath::RoundToInt(LobbyGS->PlayerSlot1.MaxPosture)));
+		Txt_AttackDamage->SetText(FText::AsNumber(FMath::RoundToInt(LobbyGS->PlayerSlot1.AttackDamage)));
+		Txt_PostureHealing->SetText(FText::AsNumber(FMath::RoundToInt(LobbyGS->PlayerSlot1.PostureHealing)));
+		Txt_RemaingPt->SetText(FText::AsNumber(LobbyGS->PlayerSlot1.RemainingPT));
+
+		Bar_MaxHp->SetPercent(LobbyGS->PlayerSlot1.MaxHp / 10);
+		Bar_MaxPosture->SetPercent(LobbyGS->PlayerSlot1.MaxPosture / 10);
+		Bar_AttackDamage->SetPercent(LobbyGS->PlayerSlot1.AttackDamage / 10);
+		Bar_PostureHealing->SetPercent(LobbyGS->PlayerSlot1.PostureHealing / 10);
 	}
 	else
 	{
 		Txt_Nickname->SetText(FText::FromString(LobbyGS->PlayerSlot2.Nickname));
+		IsPlayer01 = InIsPlayer01;
+
+		Txt_MaxHp->SetText(FText::AsNumber(FMath::RoundToInt(LobbyGS->PlayerSlot2.MaxHp)));
+		Txt_MaxPosture->SetText(FText::AsNumber(FMath::RoundToInt(LobbyGS->PlayerSlot2.MaxPosture)));
+		Txt_AttackDamage->SetText(FText::AsNumber(FMath::RoundToInt(LobbyGS->PlayerSlot2.AttackDamage)));
+		Txt_PostureHealing->SetText(FText::AsNumber(FMath::RoundToInt(LobbyGS->PlayerSlot2.PostureHealing)));
+		Txt_RemaingPt->SetText(FText::AsNumber(LobbyGS->PlayerSlot2.RemainingPT));
+
+		Bar_MaxHp->SetPercent(LobbyGS->PlayerSlot2.MaxHp / 10);
+		Bar_MaxPosture->SetPercent(LobbyGS->PlayerSlot2.MaxPosture / 10);
+		Bar_AttackDamage->SetPercent(LobbyGS->PlayerSlot2.AttackDamage / 10);
+		Bar_PostureHealing->SetPercent(LobbyGS->PlayerSlot2.PostureHealing / 10);
+	}
+}
+
+void UGamePlayerListUI::OnClickedCancleGameButton()
+{
+	LobbyRoomObject->CanclePlayer(IsPlayer01);
+}
+
+void UGamePlayerListUI::OnClickedMaxHpDownGameButton()
+{
+	if (ALobbyPlayerState* LobbyPS = Cast<ALobbyPlayerState>(GetOwningPlayerState()))
+	{
+		LobbyPS->C2S_UpdatePlayer(IsPlayer01, EGameStatType::MaxHp, -1);
+	}
+}
+
+void UGamePlayerListUI::OnClickedMaxHpUpGameButton()
+{
+	if (ALobbyPlayerState* LobbyPS = Cast<ALobbyPlayerState>(GetOwningPlayerState()))
+	{
+		LobbyPS->C2S_UpdatePlayer(IsPlayer01, EGameStatType::MaxHp, 1);
+	}
+}
+
+void UGamePlayerListUI::OnClickedMaxPostureDownGameButton()
+{
+	if (ALobbyPlayerState* LobbyPS = Cast<ALobbyPlayerState>(GetOwningPlayerState()))
+	{
+		LobbyPS->C2S_UpdatePlayer(IsPlayer01, EGameStatType::MaxPosture, -1);
+	}
+}
+
+void UGamePlayerListUI::OnClickedMaxPostureUpGameButton()
+{
+	if (ALobbyPlayerState* LobbyPS = Cast<ALobbyPlayerState>(GetOwningPlayerState()))
+	{
+		LobbyPS->C2S_UpdatePlayer(IsPlayer01, EGameStatType::MaxPosture, 1);
+	}
+}
+
+void UGamePlayerListUI::OnClickedAttackDamageDownGameButton()
+{
+	if (ALobbyPlayerState* LobbyPS = Cast<ALobbyPlayerState>(GetOwningPlayerState()))
+	{
+		LobbyPS->C2S_UpdatePlayer(IsPlayer01, EGameStatType::AttackDamage, -1);
+	}
+}
+
+void UGamePlayerListUI::OnClickedAttackDamageUpGameButton()
+{
+	if (ALobbyPlayerState* LobbyPS = Cast<ALobbyPlayerState>(GetOwningPlayerState()))
+	{
+		LobbyPS->C2S_UpdatePlayer(IsPlayer01, EGameStatType::AttackDamage, 1);
+	}
+}
+
+void UGamePlayerListUI::OnClickedPostureHealingDownGameButton()
+{
+	if (ALobbyPlayerState* LobbyPS = Cast<ALobbyPlayerState>(GetOwningPlayerState()))
+	{
+		LobbyPS->C2S_UpdatePlayer(IsPlayer01, EGameStatType::PostureHealing, -1);
+	}
+}
+
+void UGamePlayerListUI::OnClickedPostureHealingUpGameButton()
+{
+	if (ALobbyPlayerState* LobbyPS = Cast<ALobbyPlayerState>(GetOwningPlayerState()))
+	{
+		LobbyPS->C2S_UpdatePlayer(IsPlayer01, EGameStatType::PostureHealing, 1);
 	}
 }

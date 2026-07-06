@@ -83,7 +83,7 @@ void ALobbyGameState::UpdateSlot(bool IsPlayer01, APlayerState* PlayerState, EGa
 		{
 		case EGameStatType::MaxHp:
 		{
-			if (Slot->MaxHp <= 0 || Slot->MaxHp >= 10)
+			if ((Slot->MaxHp <= 0 && UpDown == -1) || (Slot->MaxHp >= 10 && UpDown == 1))
 			{
 				return;
 			}
@@ -92,7 +92,7 @@ void ALobbyGameState::UpdateSlot(bool IsPlayer01, APlayerState* PlayerState, EGa
 		}
 		case EGameStatType::MaxPosture:
 		{
-			if (Slot->MaxPosture <= 0 || Slot->MaxPosture >= 10)
+			if ((Slot->MaxPosture <= 0 && UpDown == -1) || (Slot->MaxPosture >= 10 && UpDown == 1))
 			{
 				return;
 			}
@@ -101,7 +101,7 @@ void ALobbyGameState::UpdateSlot(bool IsPlayer01, APlayerState* PlayerState, EGa
 		}
 		case EGameStatType::AttackDamage:
 		{
-			if (Slot->AttackDamage <= 0 || Slot->AttackDamage >= 10)
+			if ((Slot->AttackDamage <= 0 && UpDown == -1) || (Slot->AttackDamage >= 10 && UpDown == 1))
 			{
 				return;
 			}
@@ -110,7 +110,7 @@ void ALobbyGameState::UpdateSlot(bool IsPlayer01, APlayerState* PlayerState, EGa
 		}
 		case EGameStatType::PostureHealing:
 		{
-			if (Slot->PostureHealing <= 0 || Slot->PostureHealing >= 10)
+			if ((Slot->PostureHealing <= 0 && UpDown == -1) || (Slot->PostureHealing >= 10 && UpDown == 1))
 			{
 				return;
 			}
@@ -118,7 +118,7 @@ void ALobbyGameState::UpdateSlot(bool IsPlayer01, APlayerState* PlayerState, EGa
 			break;
 		}
 		}
-		Slot->RemainingPT += UpDown;
+		Slot->RemainingPT -= UpDown;
 	}
 	else
 	{
@@ -130,6 +130,9 @@ void ALobbyGameState::UpdateSlot(bool IsPlayer01, APlayerState* PlayerState, EGa
 		Slot->PostureHealing = 3.0f;
 		Slot->RemainingPT = 10;
 		Slot->bIsReady = false;
+
+		LobbyPS->PlayerRole = EPlayerRole::Playing;
+		LobbyPS->OnRep_PlayerRole();
 	}
 
 	if (IsPlayer01)

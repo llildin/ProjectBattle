@@ -5,6 +5,7 @@
 #include "Net/UnrealNetwork.h"
 #include "MyGameInstance.h"
 #include "LobbyGameState.h"
+#include "LobbyRoomUI.h"
 
 void ALobbyPlayerState::OnRep_Nickname()
 {
@@ -89,5 +90,37 @@ void ALobbyPlayerState::C2S_JoinPlayer_Implementation(bool InIsPlayer01)
     if (ALobbyGameState* GS = GetWorld()->GetGameState<ALobbyGameState>())
     {
         GS->UpdateSlot(InIsPlayer01, this, EGameStatType::Join, 0);
+    }
+}
+
+bool ALobbyPlayerState::C2S_UpdatePlayer_Validate(bool InIsPlayer01, EGameStatType InGameStatType, float InUpDown)
+{
+    return true;
+}
+
+void ALobbyPlayerState::C2S_UpdatePlayer_Implementation(bool InIsPlayer01, EGameStatType InGameStatType, float InUpDown)
+{
+    if (ALobbyGameState* GS = GetWorld()->GetGameState<ALobbyGameState>())
+    {
+        GS->UpdateSlot(InIsPlayer01, this, InGameStatType, InUpDown);
+    }
+}
+
+bool ALobbyPlayerState::C2S_CanclePlayer_Validate(bool InIsPlayer01)
+{
+    return true;
+}
+
+void ALobbyPlayerState::C2S_CanclePlayer_Implementation(bool InIsPlayer01)
+{
+    PlayerRole = EPlayerRole::Spectator;
+    S2C_CanclePlayer(InIsPlayer01);
+}
+
+void ALobbyPlayerState::S2C_CanclePlayer_Implementation(bool InIsPlayer01)
+{
+    if (ALobbyGameState* GS = GetWorld()->GetGameState<ALobbyGameState>())
+    {
+        GS->LobbyRoomObject->Update_CanclePlayer(InIsPlayer01);
     }
 }

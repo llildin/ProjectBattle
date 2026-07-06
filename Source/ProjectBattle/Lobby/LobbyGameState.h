@@ -42,10 +42,11 @@ UENUM(BlueprintType)
 enum class EGameStatType : uint8
 {
     Join = 0 UMETA(DisplayName = "Join"),
-    MaxHp = 10 UMETA(DisplayName = "MaxHp"),
-    MaxPosture = 20 UMETA(DisplayName = "MaxPosture"),
-    AttackDamage = 30 UMETA(DisplayName = "AttackDamage"),
-    PostureHealing = 40 UMETA(DisplayName = "PostureHealing")
+    Ready = 10 UMETA(DisplayName = "Ready"),
+    MaxHp = 20 UMETA(DisplayName = "MaxHp"),
+    MaxPosture = 30 UMETA(DisplayName = "MaxPosture"),
+    AttackDamage = 40 UMETA(DisplayName = "AttackDamage"),
+    PostureHealing = 50 UMETA(DisplayName = "PostureHealing")
 };
 
 /**

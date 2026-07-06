@@ -54,4 +54,18 @@ public:
 	void C2S_JoinPlayer(bool InIsPlayer01);
 	bool C2S_JoinPlayer_Validate(bool InIsPlayer01);
 	void C2S_JoinPlayer_Implementation(bool InIsPlayer01);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void C2S_UpdatePlayer(bool InIsPlayer01, EGameStatType InGameStatType, float InUpDown);
+	bool C2S_UpdatePlayer_Validate(bool InIsPlayer01, EGameStatType InGameStatType, float InUpDown);
+	void C2S_UpdatePlayer_Implementation(bool InIsPlayer01, EGameStatType InGameStatType, float InUpDown);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void C2S_CanclePlayer(bool InIsPlayer01);
+	bool C2S_CanclePlayer_Validate(bool InIsPlayer01);
+	void C2S_CanclePlayer_Implementation(bool InIsPlayer01);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void S2C_CanclePlayer(bool InIsPlayer01);
+	void S2C_CanclePlayer_Implementation(bool InIsPlayer01);
 };

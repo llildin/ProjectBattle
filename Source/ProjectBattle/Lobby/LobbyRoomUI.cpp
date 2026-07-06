@@ -107,3 +107,25 @@ void ULobbyRoomUI::Update_JoinPlayer(bool InIsPlayer01)
         Player02->SetContent(Player02_GamePlayerListUIObject);
     }
 }
+
+void ULobbyRoomUI::CanclePlayer(bool InIsPlayer01)
+{
+    if (ALobbyPlayerState* LobbyPS = Cast<ALobbyPlayerState>(GetOwningPlayerState()))
+    {
+        LobbyPS->C2S_CanclePlayer(InIsPlayer01);
+    }
+}
+
+void ULobbyRoomUI::Update_CanclePlayer(bool InIsPlayer01)
+{
+    if (InIsPlayer01)
+    {
+        Player01->SetContent(Player01_JoinGameUIObject);
+    }
+    else
+    {
+        Player02->SetContent(Player02_JoinGameUIObject);
+    }
+
+    RefreshUI();
+}
