@@ -6,6 +6,7 @@
 #include "MyGameInstance.h"
 #include "LobbyGameState.h"
 #include "LobbyRoomUI.h"
+#include "InGame/Contents/InGamePlayerState.h"
 
 void ALobbyPlayerState::OnRep_Nickname()
 {
@@ -21,13 +22,36 @@ void ALobbyPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 	DOREPLIFETIME(ALobbyPlayerState, Nickname);
     DOREPLIFETIME(ALobbyPlayerState, PlayerRole);
+
+    DOREPLIFETIME(ALobbyPlayerState, Nickname);
+    DOREPLIFETIME(ALobbyPlayerState, Stat_MaxHp);
+    DOREPLIFETIME(ALobbyPlayerState, Stat_MaxPosture);
+    DOREPLIFETIME(ALobbyPlayerState, Stat_AttackDamage);
+    DOREPLIFETIME(ALobbyPlayerState, Stat_PostureHealing);
+    DOREPLIFETIME(ALobbyPlayerState, IsPlayer);
 }
 
 void ALobbyPlayerState::CopyProperties(APlayerState* NewPlayerState)
 {
     Super::CopyProperties(NewPlayerState);
 
+    if (AInGamePlayerState* NewPS = Cast<AInGamePlayerState>(NewPlayerState))
+    {
+        NewPS->Nickname = Nickname;
+        NewPS->Stat_MaxHp = Stat_MaxHp;
+        NewPS->Stat_MaxPosture = Stat_MaxPosture;
+        NewPS->Stat_AttackDamage = Stat_AttackDamage;
+        NewPS->Stat_PostureHealing = Stat_PostureHealing;
 
+        if (PlayerRole == EPlayerRole::Playing)
+        {
+            NewPS->IsPlayer = true;
+        }
+        else
+        {
+            NewPS->IsPlayer = false;
+        }
+    }
 }
 
 void ALobbyPlayerState::BeginPlay()

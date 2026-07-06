@@ -68,4 +68,20 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void S2C_CanclePlayer(bool InIsPlayer01);
 	void S2C_CanclePlayer_Implementation(bool InIsPlayer01);
+
+	UPROPERTY(Replicated, BlueprintReadOnly)
+	float Stat_MaxHp;
+
+	UPROPERTY(Replicated, BlueprintReadOnly)
+	float Stat_MaxPosture;
+
+	UPROPERTY(Replicated, BlueprintReadOnly)
+	float Stat_AttackDamage;
+
+	UPROPERTY(Replicated, BlueprintReadOnly)
+	float Stat_PostureHealing;
+
+	UPROPERTY(Replicated, BlueprintReadOnly)
+	bool IsPlayer = false;
+
 };

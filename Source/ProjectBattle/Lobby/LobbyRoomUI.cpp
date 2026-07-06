@@ -150,6 +150,23 @@ void ULobbyRoomUI::OnClickedGameStartButton()
 {
     if (LobbyGS->PlayerSlot1.bIsReady && LobbyGS->PlayerSlot2.bIsReady)
     {
+        if (ALobbyPlayerState* LobbyPS1 = Cast<ALobbyPlayerState>(LobbyGS->PlayerSlot1.OwningPlayerState))
+        {
+            LobbyPS1->Nickname = LobbyGS->PlayerSlot1.Nickname;
+            LobbyPS1->Stat_MaxHp = LobbyGS->PlayerSlot1.MaxHp;
+            LobbyPS1->Stat_MaxPosture = LobbyGS->PlayerSlot1.MaxPosture;
+            LobbyPS1->Stat_PostureHealing = LobbyGS->PlayerSlot1.PostureHealing;
+            LobbyPS1->Stat_AttackDamage = LobbyGS->PlayerSlot1.AttackDamage;
+        }
+        
+        if (ALobbyPlayerState* LobbyPS2 = Cast<ALobbyPlayerState>(LobbyGS->PlayerSlot2.OwningPlayerState))
+        {
+            LobbyPS2->Nickname = LobbyGS->PlayerSlot2.Nickname;
+            LobbyPS2->Stat_MaxHp = LobbyGS->PlayerSlot2.MaxHp;
+            LobbyPS2->Stat_MaxPosture = LobbyGS->PlayerSlot2.MaxPosture;
+            LobbyPS2->Stat_PostureHealing = LobbyGS->PlayerSlot2.PostureHealing;
+            LobbyPS2->Stat_AttackDamage = LobbyGS->PlayerSlot2.AttackDamage;
+        }
         GetWorld()->ServerTravel(TEXT("/Game/Map/GameRoom"));
     }
 }
