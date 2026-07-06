@@ -119,4 +119,13 @@ public:
 
 	UFUNCTION()
 	void OnClickedPostureHealingUpGameButton();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (BindWidget))
+	TObjectPtr<UButton> Btn_Ready;
+
+	UFUNCTION()
+	void OnClickedReadyGameButton();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (BindWidget))
+	TObjectPtr<UTextBlock> Txt_Ready;
 };

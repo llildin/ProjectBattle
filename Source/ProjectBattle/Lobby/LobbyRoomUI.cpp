@@ -10,6 +10,7 @@
 #include "Components/Border.h"
 #include "JoinGameUI.h"
 #include "GamePlayerListUI.h"
+#include "Components/Button.h"
 
 void ULobbyRoomUI::NativeConstruct()
 {
@@ -33,6 +34,21 @@ void ULobbyRoomUI::NativeConstruct()
 
     Player02_GamePlayerListUIObject = CreateWidget<UGamePlayerListUI>(GetWorld(), Player02_GamePlayerListUIClass);
     Player02_GamePlayerListUIObject->SetLobbyRoomUI(this);
+
+    if (Btn_GameStart)
+    {
+        Btn_GameStart->OnClicked.RemoveDynamic(this, &ULobbyRoomUI::OnClickedGameStartButton);
+        Btn_GameStart->OnClicked.AddDynamic(this, &ULobbyRoomUI::OnClickedGameStartButton);
+    }
+
+    if (GetOwningPlayer()->HasAuthority())
+    {
+        Btn_GameStart->SetVisibility(ESlateVisibility::Visible);
+    }
+    else
+    {
+        Btn_GameStart->SetVisibility(ESlateVisibility::Collapsed);
+    }
 
     LobbyGS = Cast<ALobbyGameState>(GetWorld()->GetGameState());
     if (LobbyGS)
@@ -128,4 +144,12 @@ void ULobbyRoomUI::Update_CanclePlayer(bool InIsPlayer01)
     }
 
     RefreshUI();
+}
+
+void ULobbyRoomUI::OnClickedGameStartButton()
+{
+    if (LobbyGS->PlayerSlot1.bIsReady && LobbyGS->PlayerSlot2.bIsReady)
+    {
+        GetWorld()->ServerTravel(TEXT("/Game/Map/GameRoom"));
+    }
 }

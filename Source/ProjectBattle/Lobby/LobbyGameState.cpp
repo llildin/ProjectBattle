@@ -72,7 +72,12 @@ void ALobbyGameState::UpdateSlot(bool IsPlayer01, APlayerState* PlayerState, EGa
 
 	ALobbyPlayerState* LobbyPS = Cast<ALobbyPlayerState>(PlayerState);
 
-	if (Slot->OwningPlayerState == LobbyPS)
+
+	if (Slot->OwningPlayerState == LobbyPS && GameStatType == EGameStatType::Ready)
+	{
+		Slot->bIsReady = true;
+	}
+	else if (Slot->OwningPlayerState == LobbyPS)
 	{
 		if (Slot->RemainingPT <= 0)
 		{

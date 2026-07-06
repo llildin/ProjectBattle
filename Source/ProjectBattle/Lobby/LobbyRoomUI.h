@@ -12,6 +12,7 @@ class UJoinGameUI;
 class UGamePlayerListUI;
 class UBorder;
 class ALobbyGameState;
+class UButton;
 
 /**
  * 
@@ -24,6 +25,9 @@ class PROJECTBATTLE_API ULobbyRoomUI : public UUserWidget
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (BindWidget))
 	TObjectPtr<UVerticalBox> ObserverList;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Components", meta = (BindWidget))
+	TObjectPtr<UButton> Btn_GameStart;
 
 	virtual void NativeConstruct() override;
 
@@ -82,4 +86,7 @@ public:
 	void CanclePlayer(bool InIsPlayer01);
 
 	void Update_CanclePlayer(bool InIsPlayer01);
+
+	UFUNCTION()
+	void OnClickedGameStartButton();
 };

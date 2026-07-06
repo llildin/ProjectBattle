@@ -25,6 +25,9 @@ void ALobbyPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 void ALobbyPlayerState::CopyProperties(APlayerState* NewPlayerState)
 {
+    Super::CopyProperties(NewPlayerState);
+
+
 }
 
 void ALobbyPlayerState::BeginPlay()
