@@ -7,8 +7,6 @@
 #include "InGameGameModeBase.generated.h"
 
 class APlayerStart;
-class AInGamePlayerState;
-
 /**
  * 
  */
@@ -20,28 +18,23 @@ class PROJECTBATTLE_API AInGameGameModeBase : public AGameModeBase
 public:
 	virtual void BeginPlay() override;
 
-	UPROPERTY()
-	TArray<APlayerController*> PlayingControllers;
+	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
 
-	UPROPERTY()
-	TArray<APlayerController*> SpectatorControllers;
-
-	virtual void PostLogin(APlayerController* NewPlayer) override;
+	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 
 	void FindPlayerStarts();
 
 	UPROPERTY()
-	APlayerStart* PlayerStart1;
+	TArray<TObjectPtr<APlayerController>> PlayingControllers;
 
 	UPROPERTY()
-	APlayerStart* PlayerStart2;
+	TArray<TObjectPtr<APlayerController>> SpectatorControllers;
 
 	UPROPERTY()
-	APlayerStart* PlayerStart3;
+	TObjectPtr<APlayerStart> PlayerStart1;
 
-	void InitSpectators();
+	UPROPERTY()
+	TObjectPtr<APlayerStart> PlayerStart2;
 
-	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
-
-	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
+	void RefreshSpectatorViewTargets();
 };

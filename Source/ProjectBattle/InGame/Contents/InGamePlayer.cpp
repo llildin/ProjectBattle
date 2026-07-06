@@ -15,6 +15,7 @@
 #include "InGame/AttackFunction.h"
 #include "GameFramework/GameStateBase.h"
 #include "Net/UnrealNetwork.h"
+#include "InGamePlayerState.h"
 
 // Sets default values
 AInGamePlayer::AInGamePlayer()
