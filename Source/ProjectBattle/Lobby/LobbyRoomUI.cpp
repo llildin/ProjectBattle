@@ -15,7 +15,7 @@
 void ULobbyRoomUI::NativeConstruct()
 {
     Super::NativeConstruct();
-
+    
     if (UMyGameInstance* GI = Cast<UMyGameInstance>(GetGameInstance()))
     {
         GI->OnLobbyListChanged.AddUObject(this, &ULobbyRoomUI::RefreshUI);

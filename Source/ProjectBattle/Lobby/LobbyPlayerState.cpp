@@ -23,7 +23,6 @@ void ALobbyPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ALobbyPlayerState, Nickname);
     DOREPLIFETIME(ALobbyPlayerState, PlayerRole);
 
-    DOREPLIFETIME(ALobbyPlayerState, Nickname);
     DOREPLIFETIME(ALobbyPlayerState, Stat_MaxHp);
     DOREPLIFETIME(ALobbyPlayerState, Stat_MaxPosture);
     DOREPLIFETIME(ALobbyPlayerState, Stat_AttackDamage);
