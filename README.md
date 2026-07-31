@@ -1,4 +1,4 @@
-# ⚔️ SWORD BATTLE
+# ⚔️ SWORD BATTLE - Listen 서버 기반 실시간 대전 게임
 
 > 세키로의 패링·체간(Posture) 시스템을 기반으로 구현한 실시간 1:1 PvP 검술 대전 게임
 
