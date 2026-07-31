@@ -2,12 +2,12 @@
 
 > 세키로의 패링·체간(Posture) 시스템을 기반으로 구현한 실시간 1:1 PvP 검술 대전 게임
 
-빠른 템포의 공방이 오가는 대전 게임입니다. 최대 2명이 대전에 참여하고, 나머지 유저는 **관전자 시스템**으로 실시간 관람합니다. 게임 시작 전 능력치를 자유롭게 분배해 다양한 전략과 플레이 스타일을 구성할 수 있습니다.
+빠른 템포의 공방이 오가는 대전 게임입니다. 최대 2명이 대전에 참여하고, 나머지 플레이어는 **관전자 시스템**으로 실시간 관람합니다. 게임 시작 전 능력치를 자유롭게 분배해 다양한 전략과 플레이 스타일을 구성할 수 있습니다.
 
 | | |
 |---|---|
 | **엔진** | Unreal Engine 5.7 |
-| **언어** | C++ (핵심 로직) / Blueprint (연출·바인딩) |
+| **언어** | C++ / Blueprint |
 | **네트워크** | Listen Server 기반 멀티플레이 |
 | **개발 인원** | 1인 (김우재) |
 | **개발 기간** | 2026.06.01 ~ 2026.07.06 |
@@ -28,8 +28,6 @@
 
 ```
 Title ──▶ Lobby ──▶ Game ──▶ (종료) ──▶ Lobby
- 방 생성/검색   스탯 분배     1:1 대전
-             관전자 선정   관전자 시점
 ```
 
 | Level | 역할 | 네트워크 |
@@ -39,8 +37,8 @@ Title ──▶ Lobby ──▶ Game ──▶ (종료) ──▶ Lobby
 | **Lobby** | 참여자 2인/관전자 선정, 스탯 분배, Ready | Listen Server |
 | **Game**  | 1:1 전투 진행 및 관전자 시점 제공 | Listen Server |
 
-- Title → Lobby : `Advanced Sessions Plugin`으로 세션 참가
-- Lobby → Game : 두 플레이어 Ready 시 `Seamless Travel`로 전환
+- Title → Lobby : `Online Session` 기반으로 방 참가
+- Lobby → Game : 두 플레이어 Ready 후 게임 시작 시 `Seamless Travel`로 전환
 - Game → Lobby : 대전 종료 후 대기방 복귀
 
 <br/>
@@ -49,7 +47,7 @@ Title ──▶ Lobby ──▶ Game ──▶ (종료) ──▶ Lobby
 
 | 기술 | 사용 목적 |
 |------|-----------|
-| **Online Session** (Advanced Sessions Plugin) | Online Session 기반의 방 생성·검색·참가 기능 구현 |
+| **Online Session** | 방 생성·검색·참가 기능 구현 |
 | **Listen Server / RPC / Replication** | 실시간 멀티플레이 환경에서 플레이어 상태와 게임 데이터 동기화 |
 | **Server Authority** | 스탯 배분·전투 판정을 서버에서 검증하여 클라이언트의 임의 조작 방지 |
 | **Seamless Travel / CopyProperties** | 레벨 전환 시 플레이어 데이터를 유지하며 게임 상태를 자연스럽게 연속 |
@@ -83,29 +81,27 @@ Source/ProjectBattle/
 │       ├── AttackPracticeNPC 등         # 연습용 허수아비 NPC
 │       └── InGameGameMode / PlayerState / HUD
 │
-└── MyGameInstance  # 세션 전역 데이터 보관, UI 갱신용 통합 Delegate
+└── MyGameInstance  # 세션 전역 데이터 보관
 ```
 
-**설계 포인트**
 - **이벤트 기반 UI** — Replicated 변수 변경을 단일 Delegate로 통합해 UI 결합도 최소화
-- **UI Pooling** — 방 목록 위젯을 재사용(Collapsed 처리)하여 생성/제거 비용 절감
+- **UI Pooling** — 방 목록 위젯을 재사용(Collapsed 처리)하여 생성/제거 관리
 - **레벨 간 데이터 유지** — `GameInstance` + `PlayerState::CopyProperties`로 상태 연속
-- **네트워크 최적화** — 지속 변화하는 체간 수치는 클라이언트가 예측 계산하고, 실제 값은 서버에서만 관리(피격 시 S2C 동기화)하여 Tick 기반 RPC/Replication 비용 절감 (아래 트러블슈팅 참고)
 
 <br/>
 
 ## 트러블슈팅 — 체간(Posture) 수치 동기화 구조 개선
 
 **문제 배경**
-지속적으로 변하는 체간 값을 클라이언트가 매 Tick 계산해 서버로 전달(C2S RPC)하고, 이를 모든 클라이언트에 Replication하는 구조였습니다.
+지속적으로 변하는 체간 값을 클라이언트가 매 Tick 계산해 서버로 전달하고, 이를 모든 클라이언트에 Replication하는 구조였습니다.
 → 클라이언트의 값 조작이 가능하고, 전투 내내 불필요한 네트워크 호출이 발생했습니다.
 
 **해결 방법**
 실제 체간 값은 서버(Server Authority)에서만 관리하고, 클라이언트는 UI 표시용 회복분만 독립적으로 예측 계산하도록 분리했습니다.
-실제 값이 바뀌는 피격 시점에만 서버가 클라이언트로 값을 전달(S2C)해 보정합니다.
+실제 값이 바뀌는 피격 시점에만 서버가 클라이언트로 값을 전달해 보정합니다.
 
 **결과**
-- 매 Tick 호출되던 C2S RPC를 피격 시점으로 한정하고, 상시 발생하던 체간 Replication을 제거해 네트워크 호출을 줄이고 값 조작을 차단했습니다.
+- 매 Tick 호출되던 RPC를 피격 시점으로 한정하고, 상시 발생하던 체간 Replication을 제거해 네트워크 호출을 줄이고 값 조작을 차단했습니다.
 - 네트워크 동기화 주기와 무관하게 클라이언트가 매 프레임 UI를 갱신하므로, 더 부드러운 체간 게이지 변화를 표현할 수 있었습니다.
 
 
